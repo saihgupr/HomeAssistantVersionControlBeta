@@ -35,41 +35,82 @@ Home Assistant Version Control acts as a "time machine" for your setup. It autom
 
 ---
 
-##  Installation
+## Installation
 
-### Option 1: Home Assistant Add-on (Recommended)
+There are two ways to install Home Assistant Version Control: as a Home Assistant add-on or as a standalone Docker container.
+
+### 1. Home Assistant Add-on (Recommended for most users)
 
 1.  **Add Repository:**
     Click the button below to add the repository to your Home Assistant instance:
 
     [![Open your Home Assistant instance and show the add-on store](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https://github.com/saihgupr/HomeAssistantVersionControlBeta)
 
-    *Or manually add this URL to the Add-on Store:*
-    `https://github.com/saihgupr/HomeAssistantVersionControlBeta`
+    **Or manually add it:**
+    - Navigate to **Settings** → **Add-ons** → **Add-on Store**
+    - Click the three dots (⋮) in the top right corner and select **Repositories**
+    - Add the repository URL:
+      ```
+      https://github.com/saihgupr/HomeAssistantVersionControlBeta
+      ```
 
-2.  **Install:** Search for **"Home Assistant Version Control Beta"** in the store and click **Install**.
+2.  **Install the Add-on:**
+    The "Home Assistant Version Control Beta" add-on will now appear in the store. Click on it and then click "Install".
+
 3.  **Start:** Start the add-on and click **"Open Web UI"** to access the interface.
+
 4.  **Optional (External Access):** To access the UI externally at port `54001`, enable the port in the add-on's **Configuration** tab (disabled by default).
 
-### Option 2: Standalone Docker Container
+### 2. Standalone Docker Installation
 
-Use this method if you are running Home Assistant Container or want to run the tool in a separate environment.
+For Docker users who aren't using the Home Assistant add-on, you have three deployment options:
+
+**Option A: Docker Compose (recommended):**
+
+1. Download the docker-compose.yml file:
+   ```bash
+   curl -o docker-compose.yml https://raw.githubusercontent.com/saihgupr/HomeAssistantVersionControlBeta/main/docker-compose.yml
+   ```
+
+2. Edit the file to set your paths and timezone:
+   ```bash
+   nano docker-compose.yml
+   # Update the volume path: /path/to/your/ha/config
+   # Update timezone: TZ environment variable (e.g., America/New_York)
+   ```
+
+3. Start the service:
+   ```bash
+   docker compose up -d
+   ```
+
+Access the interface at `http://localhost:54001`.
+
+**Option B: Docker Run (pre-built image):**
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/saihgupr/HomeAssistantVersionControlBeta.git
-cd HomeAssistantVersionControlBeta
-
-# 2. Build the image
-docker build --build-arg BUILD_FROM=alpine:latest -t home-assistant-version-control .
-
-# 3. Run the container
-# Ensure /path/to/your/config maps to your actual HA config directory
 docker run -d \
-  --name home-assistant-version-control \
   -p 54001:54001 \
   -v /path/to/your/config:/config \
   -e TZ=America/New_York \
+  --name home-assistant-version-control \
+  ghcr.io/saihgupr/homeassistantversioncontrolbeta:latest
+```
+
+Replace `/path/to/your/config` with the actual path to your Home Assistant configuration directory.
+
+**Option C: Build locally:**
+
+```bash
+git clone https://github.com/saihgupr/HomeAssistantVersionControlBeta.git
+cd HomeAssistantVersionControlBeta/homeassistant-version-control
+docker build --build-arg BUILD_FROM=alpine:latest -t home-assistant-version-control .
+
+docker run -d \
+  -p 54001:54001 \
+  -v /path/to/your/config:/config \
+  -e TZ=America/New_York \
+  --name home-assistant-version-control \
   home-assistant-version-control
 ```
 
