@@ -29,9 +29,15 @@ Home Assistant Version Control acts as a "time machine" for your setup. It autom
 * **"Time Travel":** Long-press the restore button to revert the entire system to a previous point in time.
 
 ###  Customization
-* **Accent Colors:** Choose from 7 beautiful pre-set color palettes.
+* **Accent Colors:** Choose from seven preset color palettes.
 * **Themes:** Toggle between Light and Dark modes.
 * **Diff Viewer:** Customize your diff experience with 8 different styles (High Contrast, GitHub Classic, Neon, etc.) and choose between Unified or Side-by-Side views.
+
+
+
+• Accent Colors: Pick from seven curated color palettes.
+• Themes: Switch instantly between Light and Dark.
+• Diff Viewer: Choose from eight diff styles (High Contrast, GitHub Classic, Neon, and more) and view changes in Unified or Side-by-Side mode.
 
 ---
 
