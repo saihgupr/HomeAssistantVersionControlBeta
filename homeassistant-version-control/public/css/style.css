@@ -1541,6 +1541,8 @@ body.dark-mode .color-circle.selected {
   white-space: nowrap;
 }
 
+
+
 .diff-viewer-unified {
   display: flex;
   flex-direction: column;

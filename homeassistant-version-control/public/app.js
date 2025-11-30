@@ -1839,10 +1839,9 @@ async function displayCommitDiff(status, hash, diff, commitDate = null) {
           </div>
           <div class="file-diff-content" style="${displayStyle}">
             <div class="diff-view-container">
-              <div class="diff-header-unified">
-                <div class="diff-header-text">
-                  Current Version
-                </div>
+              <div class="segmented-control" style="cursor: default; grid-template-columns: 1fr;">
+                <div class="segmented-control-slider" style="width: calc(100% - 8px);"></div>
+                <label style="cursor: default; color: var(--text-primary);">Current Version</label>
               </div>
               <div class="diff-viewer-shell ${currentDiffStyle}">
                 <div class="diff-viewer-unified">
@@ -1856,10 +1855,9 @@ async function displayCommitDiff(status, hash, diff, commitDate = null) {
       // Single file - no dropdown needed
       allDiffsHtml += `
         <div class="diff-view-container">
-          <div class="diff-header-unified">
-            <div class="diff-header-text">
-              Current Version
-            </div>
+          <div class="segmented-control" style="cursor: default; grid-template-columns: 1fr;">
+            <div class="segmented-control-slider" style="width: calc(100% - 8px);"></div>
+            <label style="cursor: default; color: var(--text-primary);">Current Version</label>
           </div>
           <div class="diff-viewer-shell ${currentDiffStyle}">
             <div class="diff-viewer-unified">
@@ -2742,10 +2740,9 @@ function renderUnchangedView(content, options = {}) {
         </div>
       </div>
       <div class="diff-view-container">
-        <div class="diff-header-unified">
-          <div class="diff-header-text">
-            Current Version
-          </div>
+        <div class="segmented-control" style="cursor: default; grid-template-columns: 1fr;">
+          <div class="segmented-control-slider" style="width: calc(100% - 8px);"></div>
+          <label style="cursor: default; color: var(--text-primary);">Current Version</label>
         </div>
         <div class="diff-viewer-shell ${currentDiffStyle}">
           <div class="diff-viewer-unified">
