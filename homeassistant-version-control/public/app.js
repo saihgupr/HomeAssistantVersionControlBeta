@@ -3291,7 +3291,7 @@ function renderHunksWithSeparators(hunks, format = 'unified', totalLines = 0, di
       const expanderId = `expander-top-${diffId || Date.now()}`;
 
       parts.push(`
-        <div class="diff-expand-separator" id="${expanderId}" onclick="expandDiffContext('${expanderId}', ${effectiveStartLine}, ${firstHunk.oldStart - 1}, '${diffId}', ${startLineOffset})">
+        <div class="diff-expand-separator" id="${expanderId}" onclick="expandDiffContext('${expanderId}', ${effectiveStartLine}, ${firstHunk.oldStart - 1}, '${diffId}', ${startLineOffset}, '${format}')">
           <span class="diff-expand-icon">⋯</span> Expand ${lineCount} line${lineCount !== 1 ? 's' : ''} above
         </div>
       `);
@@ -3316,7 +3316,7 @@ function renderHunksWithSeparators(hunks, format = 'unified', totalLines = 0, di
         const expanderId = `expander-${i}-${diffId || Date.now()}`;
 
         parts.push(`
-          <div class="diff-expand-separator" id="${expanderId}" onclick="expandDiffContext('${expanderId}', ${prevOldEnd}, ${currentOldStart - 1}, '${diffId}', ${startLineOffset})">
+          <div class="diff-expand-separator" id="${expanderId}" onclick="expandDiffContext('${expanderId}', ${prevOldEnd}, ${currentOldStart - 1}, '${diffId}', ${startLineOffset}, '${format}')">
             <span class="diff-expand-icon">⋯</span> Expand ${lineCount} line${lineCount !== 1 ? 's' : ''}
           </div>
         `);
@@ -3354,7 +3354,7 @@ function renderHunksWithSeparators(hunks, format = 'unified', totalLines = 0, di
       const expanderId = `expander-bottom-${diffId || Date.now()}`;
 
       parts.push(`
-        <div class="diff-expand-separator" id="${expanderId}" onclick="expandDiffContext('${expanderId}', ${lastHunkEnd}, ${totalLines}, '${diffId}', ${startLineOffset})">
+        <div class="diff-expand-separator" id="${expanderId}" onclick="expandDiffContext('${expanderId}', ${lastHunkEnd}, ${totalLines}, '${diffId}', ${startLineOffset}, '${format}')">
           <span class="diff-expand-icon">⋯</span> Expand ${lineCount} line${lineCount !== 1 ? 's' : ''} below
         </div>
       `);
@@ -3704,7 +3704,7 @@ function escapeHtml(text) {
 // Store original content for expand functionality
 const diffContexts = {}; // Map of diffId -> oldText
 
-function expandDiffContext(expanderId, startLine, endLine, diffId, offset = 0) {
+function expandDiffContext(expanderId, startLine, endLine, diffId, offset = 0, format = 'unified') {
   const expander = document.getElementById(expanderId);
   if (!expander) return;
 
@@ -3728,13 +3728,36 @@ function expandDiffContext(expanderId, startLine, endLine, diffId, offset = 0) {
   for (let i = 0; i < contextLines.length; i++) {
     const lineNum = startLine + i;
     const lineText = contextLines[i];
-    contextHtml += `
-      <div class="diff-line diff-line-context">
-        <span class="diff-line-marker"> </span>
-        <span class="diff-line-num">${lineNum}</span>
-        <pre class="diff-line-text"><code>${escapeHtml(lineText)}</code></pre>
-      </div>
-    `;
+    const escapedText = escapeHtml(lineText);
+
+    if (format === 'split') {
+      contextHtml += `
+        <div class="diff-row diff-row-context">
+          <div class="diff-cell diff-cell-left">
+            <div class="diff-line diff-line-context diff-line-left">
+              <span class="diff-line-marker"> </span>
+              <span class="diff-line-num">${lineNum}</span>
+              <pre class="diff-line-text"><code>${escapedText}</code></pre>
+            </div>
+          </div>
+          <div class="diff-cell diff-cell-right">
+            <div class="diff-line diff-line-context diff-line-right">
+              <span class="diff-line-marker"> </span>
+              <span class="diff-line-num">${lineNum}</span>
+              <pre class="diff-line-text"><code>${escapedText}</code></pre>
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      contextHtml += `
+        <div class="diff-line diff-line-context">
+          <span class="diff-line-marker"> </span>
+          <span class="diff-line-num">${lineNum}</span>
+          <pre class="diff-line-text"><code>${escapedText}</code></pre>
+        </div>
+      `;
+    }
   }
 
   // Replace expander with context lines
