@@ -2178,8 +2178,12 @@ async function showFileHistory(filePath) {
         displayFileHistory(filePath);
       } else {
         // No changes found - show current version with unchanged diff styling
+        // Get the most recent commit (current hash) for display
+        const mostRecentCommit = data.log.all.length > 0 ? data.log.all[0] : null;
         const unchangedHtml = renderUnchangedView(currentContent, {
-          startLineNum: 1
+          startLineNum: 1,
+          commitDate: mostRecentCommit ? mostRecentCommit.date : null,
+          commitHash: mostRecentCommit ? mostRecentCommit.hash : data.currentHash
         });
         document.getElementById('rightPanel').innerHTML = unchangedHtml;
         document.getElementById('rightPanelActions').innerHTML = '';
@@ -2317,8 +2321,13 @@ async function showAutomationHistory(automationId) {
         const yamlContent = dumpYaml(auto.content);
         const startLineNum = (auto && auto.line) ? auto.line : 1;
 
+        // Get most recent commit from history for display
+        const mostRecentCommit = data.history.length > 0 ? data.history[0] : null;
+
         const unchangedHtml = renderUnchangedView(yamlContent, {
-          startLineNum: startLineNum
+          startLineNum: startLineNum,
+          commitDate: mostRecentCommit ? mostRecentCommit.date : null,
+          commitHash: mostRecentCommit ? mostRecentCommit.hash : null
         });
 
         document.getElementById('rightPanel').innerHTML = unchangedHtml;
@@ -2545,8 +2554,13 @@ async function showScriptHistory(scriptId) {
         const yamlContent = dumpYaml(script.content);
         const startLineNum = (script && script.line) ? script.line : 1;
 
+        // Get most recent commit from history for display
+        const mostRecentCommit = data.history.length > 0 ? data.history[0] : null;
+
         const unchangedHtml = renderUnchangedView(yamlContent, {
-          startLineNum: startLineNum
+          startLineNum: startLineNum,
+          commitDate: mostRecentCommit ? mostRecentCommit.date : null,
+          commitHash: mostRecentCommit ? mostRecentCommit.hash : null
         });
 
         document.getElementById('rightPanel').innerHTML = unchangedHtml;
@@ -2686,11 +2700,15 @@ function dumpYaml(obj) {
  * @param {string} content - The content to display
  * @param {Object} options - Options for rendering
  * @param {number} options.startLineNum - Starting line number (default: 1)
+ * @param {string} options.commitDate - Commit date (ISO format)
+ * @param {string} options.commitHash - Commit hash
  * @returns {string} HTML string for the unchanged view
  */
 function renderUnchangedView(content, options = {}) {
   const {
-    startLineNum = 1
+    startLineNum = 1,
+    commitDate = null,
+    commitHash = null
   } = options;
 
   // Split content into lines
@@ -2711,16 +2729,16 @@ function renderUnchangedView(content, options = {}) {
     `;
   });
 
-  // Format current date like "Nov 30, 2025 1:04 PM"
-  const now = new Date();
-  const formattedDate = formatDateForBanner(now.toISOString());
+  // Format commit date like "Nov 30, 2025 1:04 PM (2ec8a8d)"
+  const formattedDate = commitDate ? formatDateForBanner(commitDate) : new Date().toLocaleDateString();
+  const hashDisplay = commitHash ? ` (${commitHash.substring(0, 7)})` : '';
 
   // Wrap in file-history-viewer with header banner
   return `
     <div class="file-history-viewer">
       <div class="file-history-header">
         <div class="file-history-info">
-          <div class="history-position">Version 1 of 1 — ${formattedDate}</div>
+          <div class="history-position">Version 1 of 1 — ${formattedDate}${hashDisplay}</div>
         </div>
       </div>
       <div class="diff-view-container">
