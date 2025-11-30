@@ -2177,8 +2177,16 @@ async function showFileHistory(filePath) {
       if (currentFileHistory.length > 0) {
         displayFileHistory(filePath);
       } else {
-        document.getElementById('rightPanel').innerHTML = `<div class="empty">${t('files.no_changes_in_history')}</div>`;
+        // No changes found - show current version with unchanged diff styling
+        const unchangedHtml = renderUnchangedView(currentContent, {
+          startLineNum: 1,
+          title: 'Version 1 of 1',
+          timestamp: new Date().toLocaleString()
+        });
+        document.getElementById('rightPanel').innerHTML = unchangedHtml;
+        document.getElementById('rightPanelActions').innerHTML = '';
       }
+
 
 
     } else {
@@ -2303,39 +2311,21 @@ async function showAutomationHistory(automationId) {
 
 
       } else {
-        // No changes found - show current version in full history viewer format
+        // No changes found - show current version with unchanged diff styling
+        const auto = allAutomations.find(a => a.id === automationId);
         document.getElementById('rightPanelTitle').textContent = auto ? auto.name : 'Automation';
-        // document.getElementById('itemsSubtitle').textContent = 'History (1 version)';
         document.getElementById('rightPanelActions').innerHTML = '';
 
         const yamlContent = dumpYaml(auto.content);
-        const now = new Date().toLocaleString();
+        const startLineNum = (auto && auto.line) ? auto.line : 1;
 
-        // Display as separate lines (like diff viewer)
-        const yamlLines = yamlContent.split(/\r\n?|\n/);
-        let contentHtml = '';
-        let lineNum = (auto && auto.line) ? (auto.line - 1) : 0;
-
-        yamlLines.forEach(line => {
-          // Skip empty lines at the end
-          if (line.trim() || yamlLines.indexOf(line) < yamlLines.length - 1) {
-            lineNum++;
-            contentHtml += `<div class="diff-line unchanged"><span class="line-number">${lineNum}</span><span class="line-content">  ${escapeHtml(line)}</span></div>`;
-          }
+        const unchangedHtml = renderUnchangedView(yamlContent, {
+          startLineNum: startLineNum,
+          title: 'Version 1 of 1',
+          timestamp: new Date().toLocaleString()
         });
 
-        document.getElementById('rightPanel').innerHTML = `
-              <div class="file-history-viewer">
-                <div class="file-history-header">
-                  <div class="file-history-info">
-                    <div class="history-position">Version 1 of 1 - ${now}</div>
-                  </div>
-                </div>
-                <div class="diff-view-container">
-                  ${contentHtml}
-                </div>
-              </div>
-            `;
+        document.getElementById('rightPanel').innerHTML = unchangedHtml;
       }
     } else {
       let debugHtml = '';
@@ -2551,39 +2541,21 @@ async function showScriptHistory(scriptId) {
 
 
       } else {
-        // No changes found - show current version in full history viewer format
+        // No changes found - show current version with unchanged diff styling
+        const script = allScripts.find(s => s.id === scriptId);
         document.getElementById('rightPanelTitle').textContent = script ? script.name : 'Script';
-        // document.getElementById('itemsSubtitle').textContent = 'History (1 version)';
         document.getElementById('rightPanelActions').innerHTML = '';
 
         const yamlContent = dumpYaml(script.content);
-        const now = new Date().toLocaleString();
+        const startLineNum = (script && script.line) ? script.line : 1;
 
-        // Display as separate lines (like diff viewer)
-        const yamlLines = yamlContent.split(/\r\n?|\n/);
-        let contentHtml = '';
-        let lineNum = (script && script.line) ? (script.line - 1) : 0;
-
-        yamlLines.forEach(line => {
-          // Skip empty lines at the end
-          if (line.trim() || yamlLines.indexOf(line) < yamlLines.length - 1) {
-            lineNum++;
-            contentHtml += `<div class="diff-line unchanged"><span class="line-number">${lineNum}</span><span class="line-content">  ${escapeHtml(line)}</span></div>`;
-          }
+        const unchangedHtml = renderUnchangedView(yamlContent, {
+          startLineNum: startLineNum,
+          title: 'Version 1 of 1',
+          timestamp: new Date().toLocaleString()
         });
 
-        document.getElementById('rightPanel').innerHTML = `
-              <div class="file-history-viewer">
-                <div class="file-history-header">
-                  <div class="file-history-info">
-                    <div class="history-position">Version 1 of 1 - ${now}</div>
-                  </div>
-                </div>
-                <div class="diff-view-container">
-                  ${contentHtml}
-                </div>
-              </div>
-            `;
+        document.getElementById('rightPanel').innerHTML = unchangedHtml;
       }
     } else {
       let debugHtml = '';
@@ -2713,6 +2685,50 @@ function dumpYaml(obj) {
     return JSON.stringify(obj, null, 2);
   }
 }
+
+/**
+ * Render unchanged content view (for files/automations/scripts with no history)
+ * @param {string} content - The content to display
+ * @param {Object} options - Options for rendering
+ * @param {number} options.startLineNum - Starting line number (default: 1)
+ * @param {string} options.title - Optional title for the header
+ * @param {string} options.timestamp - Optional timestamp for the header
+ * @returns {string} HTML string for the unchanged view
+ */
+function renderUnchangedView(content, options = {}) {
+  const {
+    startLineNum = 1,
+    title = 'Version 1 of 1',
+    timestamp = new Date().toLocaleString()
+  } = options;
+
+  // Split content into lines
+  const lines = content.split(/\r\n?|\n/);
+  let contentHtml = '';
+  let lineNum = startLineNum - 1;
+
+  lines.forEach((line, index) => {
+    // Skip empty lines at the end
+    if (line.trim() || index < lines.length - 1) {
+      lineNum++;
+      contentHtml += `<div class="diff-line unchanged"><span class="line-number">${lineNum}</span><span class="line-content">  ${escapeHtml(line)}</span></div>`;
+    }
+  });
+
+  return `
+    <div class="file-history-viewer">
+      <div class="file-history-header">
+        <div class="file-history-info">
+          <div class="history-position">${title} - ${timestamp}</div>
+        </div>
+      </div>
+      <div class="diff-view-container">
+        ${contentHtml}
+      </div>
+    </div>
+  `;
+}
+
 
 
 function generateClippedDiffHTML(baseLines, compareLines, context = 3, startLineOffset = 0) {
