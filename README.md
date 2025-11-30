@@ -155,8 +155,7 @@ The add-on automatically tracks configuration files while ignoring system files.
 
 ---
 
-<details>
-<summary><h2>API</h2></summary>
+## API
 
 API for advanced users or automation.
 
@@ -234,7 +233,7 @@ curl -X POST http://homeassistant.local:54001/api/retention/cleanup \
   -d '{"hours": 24}'
 ```
 
-</details>
+
 
 ---
 

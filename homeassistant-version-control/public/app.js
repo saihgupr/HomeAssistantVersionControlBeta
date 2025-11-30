@@ -2179,9 +2179,7 @@ async function showFileHistory(filePath) {
       } else {
         // No changes found - show current version with unchanged diff styling
         const unchangedHtml = renderUnchangedView(currentContent, {
-          startLineNum: 1,
-          title: 'Version 1 of 1',
-          timestamp: new Date().toLocaleString()
+          startLineNum: 1
         });
         document.getElementById('rightPanel').innerHTML = unchangedHtml;
         document.getElementById('rightPanelActions').innerHTML = '';
@@ -2320,9 +2318,7 @@ async function showAutomationHistory(automationId) {
         const startLineNum = (auto && auto.line) ? auto.line : 1;
 
         const unchangedHtml = renderUnchangedView(yamlContent, {
-          startLineNum: startLineNum,
-          title: 'Version 1 of 1',
-          timestamp: new Date().toLocaleString()
+          startLineNum: startLineNum
         });
 
         document.getElementById('rightPanel').innerHTML = unchangedHtml;
@@ -2550,9 +2546,7 @@ async function showScriptHistory(scriptId) {
         const startLineNum = (script && script.line) ? script.line : 1;
 
         const unchangedHtml = renderUnchangedView(yamlContent, {
-          startLineNum: startLineNum,
-          title: 'Version 1 of 1',
-          timestamp: new Date().toLocaleString()
+          startLineNum: startLineNum
         });
 
         document.getElementById('rightPanel').innerHTML = unchangedHtml;
@@ -2688,42 +2682,47 @@ function dumpYaml(obj) {
 
 /**
  * Render unchanged content view (for files/automations/scripts with no history)
+ * Uses the same format as timeline tab when showing unchanged files
  * @param {string} content - The content to display
  * @param {Object} options - Options for rendering
  * @param {number} options.startLineNum - Starting line number (default: 1)
- * @param {string} options.title - Optional title for the header
- * @param {string} options.timestamp - Optional timestamp for the header
  * @returns {string} HTML string for the unchanged view
  */
 function renderUnchangedView(content, options = {}) {
   const {
-    startLineNum = 1,
-    title = 'Version 1 of 1',
-    timestamp = new Date().toLocaleString()
+    startLineNum = 1
   } = options;
 
   // Split content into lines
   const lines = content.split(/\r\n?|\n/);
+
+  // Use generateFullFileHTML to match timeline's unchanged file display
   let contentHtml = '';
   let lineNum = startLineNum - 1;
 
-  lines.forEach((line, index) => {
-    // Skip empty lines at the end
-    if (line.trim() || index < lines.length - 1) {
-      lineNum++;
-      contentHtml += `<div class="diff-line unchanged"><span class="line-number">${lineNum}</span><span class="line-content">  ${escapeHtml(line)}</span></div>`;
-    }
+  lines.forEach(line => {
+    lineNum++;
+    contentHtml += `
+      <div class="diff-line diff-line-context">
+        <span class="diff-line-marker"> </span>
+        <span class="diff-line-num">${lineNum}</span>
+        <pre class="diff-line-text"><code>${escapeHtml(line) || '&nbsp;'}</code></pre>
+      </div>
+    `;
   });
 
+  // Wrap in same structure as timeline uses for unchanged files
   return `
-    <div class="file-history-viewer">
-      <div class="file-history-header">
-        <div class="file-history-info">
-          <div class="history-position">${title} - ${timestamp}</div>
+    <div class="diff-view-container">
+      <div class="diff-header-unified">
+        <div class="diff-header-text">
+          Current Version
         </div>
       </div>
-      <div class="diff-view-container">
-        ${contentHtml}
+      <div class="diff-viewer-shell ${currentDiffStyle}">
+        <div class="diff-viewer-unified">
+          ${contentHtml}
+        </div>
       </div>
     </div>
   `;
