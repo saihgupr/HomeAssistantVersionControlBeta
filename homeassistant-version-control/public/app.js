@@ -2020,6 +2020,7 @@ async function displayCommitDiff(status, hash, diff, commitDate = null) {
 
 let currentFileHistory = []; // Store file history for time slider
 let currentFileHistoryIndex = 0; // Current position in history
+let isScanningHistory = false; // Flag to track if we are currently scanning history
 
 async function loadScripts() {
   const leftPanel = document.getElementById('leftPanel');
@@ -2231,6 +2232,7 @@ async function showFileHistory(filePath) {
       currentFileHistoryIndex = 0;
       let lastKeptContent = null;
       let isFirstVersion = true;
+      isScanningHistory = true;
 
       // Process versions progressively
       for (let i = 0; i < data.log.all.length; i++) {
@@ -2277,6 +2279,12 @@ async function showFileHistory(filePath) {
         }
       }
 
+      // Scanning complete
+      isScanningHistory = false;
+      if (currentFileHistory.length > 0) {
+        updateFileHistoryNavigation(filePath);
+      }
+
       // If no versions with changes were found
       if (currentFileHistory.length === 0) {
         document.getElementById('rightPanel').innerHTML = `<div class="empty">${t('history.no_changes')}</div>`;
@@ -2300,7 +2308,11 @@ function updateFileHistoryNavigation(filePath) {
 
   if (historyPosition && prevBtn && nextBtn) {
     const currentCommit = currentFileHistory[currentFileHistoryIndex];
-    historyPosition.textContent = `Version ${currentFileHistoryIndex + 1} of ${currentFileHistory.length} — ${formatDateForBanner(currentCommit.date)}`;
+    if (isScanningHistory) {
+      historyPosition.textContent = `Version ${currentFileHistoryIndex + 1} — ${formatDateForBanner(currentCommit.date)}`;
+    } else {
+      historyPosition.textContent = `Version ${currentFileHistoryIndex + 1} of ${currentFileHistory.length} — ${formatDateForBanner(currentCommit.date)}`;
+    }
 
     // Update button states
     prevBtn.disabled = currentFileHistoryIndex === 0;
@@ -2378,6 +2390,7 @@ async function showAutomationHistory(automationId) {
       currentAutomationHistoryIndex = 0;
       let lastKeptContent = null;
       let isFirstVersion = true;
+      isScanningHistory = true;
 
       // Process versions progressively
       for (let i = 0; i < data.history.length; i++) {
@@ -2420,6 +2433,12 @@ async function showAutomationHistory(automationId) {
           // Update the navigation controls for subsequent versions
           updateAutomationHistoryNavigation();
         }
+      }
+
+      // Scanning complete
+      isScanningHistory = false;
+      if (currentAutomationHistory.length > 0) {
+        updateAutomationHistoryNavigation();
       }
 
       // If no versions with changes were found
@@ -2505,8 +2524,14 @@ async function loadAutomationHistoryDiff() {
   const currentCommit = currentAutomationHistory[currentAutomationHistoryIndex];
 
   // Update position indicator
-  document.getElementById('automationHistoryPosition').textContent =
-    `Version ${currentAutomationHistoryIndex + 1} of ${currentAutomationHistory.length} — ${formatDateForBanner(currentCommit.date)}`;
+  // Update position indicator
+  if (isScanningHistory) {
+    document.getElementById('automationHistoryPosition').textContent =
+      `Version ${currentAutomationHistoryIndex + 1} — ${formatDateForBanner(currentCommit.date)}`;
+  } else {
+    document.getElementById('automationHistoryPosition').textContent =
+      `Version ${currentAutomationHistoryIndex + 1} of ${currentAutomationHistory.length} — ${formatDateForBanner(currentCommit.date)}`;
+  }
 
   // Update button states
   document.getElementById('autoPrevBtn').disabled = currentAutomationHistoryIndex === 0;
@@ -2547,7 +2572,11 @@ function updateAutomationHistoryNavigation() {
 
   if (historyPosition && prevBtn && nextBtn) {
     const currentCommit = currentAutomationHistory[currentAutomationHistoryIndex];
-    historyPosition.textContent = `Version ${currentAutomationHistoryIndex + 1} of ${currentAutomationHistory.length} — ${formatDateForBanner(currentCommit.date)}`;
+    if (isScanningHistory) {
+      historyPosition.textContent = `Version ${currentAutomationHistoryIndex + 1} — ${formatDateForBanner(currentCommit.date)}`;
+    } else {
+      historyPosition.textContent = `Version ${currentAutomationHistoryIndex + 1} of ${currentAutomationHistory.length} — ${formatDateForBanner(currentCommit.date)}`;
+    }
 
     // Update button states
     prevBtn.disabled = currentAutomationHistoryIndex === 0;
@@ -2617,6 +2646,7 @@ async function showScriptHistory(scriptId) {
       currentScriptHistoryIndex = 0;
       let lastKeptContent = null;
       let isFirstVersion = true;
+      isScanningHistory = true;
 
       // Process versions progressively
       for (let i = 0; i < data.history.length; i++) {
@@ -2659,6 +2689,12 @@ async function showScriptHistory(scriptId) {
           // Update the navigation controls for subsequent versions
           updateScriptHistoryNavigation();
         }
+      }
+
+      // Scanning complete
+      isScanningHistory = false;
+      if (currentScriptHistory.length > 0) {
+        updateScriptHistoryNavigation();
       }
 
       // If no versions with changes were found
@@ -2744,8 +2780,14 @@ async function loadScriptHistoryDiff() {
   const currentCommit = currentScriptHistory[currentScriptHistoryIndex];
 
   // Update position indicator
-  document.getElementById('scriptHistoryPosition').textContent =
-    `Version ${currentScriptHistoryIndex + 1} of ${currentScriptHistory.length} — ${formatDateForBanner(currentCommit.date)}`;
+  // Update position indicator
+  if (isScanningHistory) {
+    document.getElementById('scriptHistoryPosition').textContent =
+      `Version ${currentScriptHistoryIndex + 1} — ${formatDateForBanner(currentCommit.date)}`;
+  } else {
+    document.getElementById('scriptHistoryPosition').textContent =
+      `Version ${currentScriptHistoryIndex + 1} of ${currentScriptHistory.length} — ${formatDateForBanner(currentCommit.date)}`;
+  }
 
   // Update button states
   document.getElementById('scriptPrevBtn').disabled = currentScriptHistoryIndex === 0;
@@ -2789,7 +2831,11 @@ function updateScriptHistoryNavigation() {
 
   if (historyPosition && prevBtn && nextBtn) {
     const currentCommit = currentScriptHistory[currentScriptHistoryIndex];
-    historyPosition.textContent = `Version ${currentScriptHistoryIndex + 1} of ${currentScriptHistory.length} — ${formatDateForBanner(currentCommit.date)}`;
+    if (isScanningHistory) {
+      historyPosition.textContent = `Version ${currentScriptHistoryIndex + 1} — ${formatDateForBanner(currentCommit.date)}`;
+    } else {
+      historyPosition.textContent = `Version ${currentScriptHistoryIndex + 1} of ${currentScriptHistory.length} — ${formatDateForBanner(currentCommit.date)}`;
+    }
 
     // Update button states
     prevBtn.disabled = currentScriptHistoryIndex === 0;
@@ -3012,8 +3058,14 @@ async function loadFileHistoryDiff(filePath) {
   const currentCommit = currentFileHistory[currentFileHistoryIndex];
 
   // Update position indicator
-  document.getElementById('historyPosition').textContent =
-    `Version ${currentFileHistoryIndex + 1} of ${currentFileHistory.length} — ${formatDateForBanner(currentCommit.date)}`;
+  // Update position indicator
+  if (isScanningHistory) {
+    document.getElementById('historyPosition').textContent =
+      `Version ${currentFileHistoryIndex + 1} — ${formatDateForBanner(currentCommit.date)}`;
+  } else {
+    document.getElementById('historyPosition').textContent =
+      `Version ${currentFileHistoryIndex + 1} of ${currentFileHistory.length} — ${formatDateForBanner(currentCommit.date)}`;
+  }
 
   // Update button states
   document.getElementById('prevBtn').disabled = currentFileHistoryIndex === 0;
