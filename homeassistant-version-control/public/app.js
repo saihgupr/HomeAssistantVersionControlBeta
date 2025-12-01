@@ -1100,6 +1100,19 @@ function formatDateDisplay(bucket) {
   }
 }
 
+function formatDateForLabel(dateString) {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+}
+
 // File path utilities
 
 function parseFilePath(filePath) {
@@ -1711,14 +1724,19 @@ async function showCommit(hash) {
       const diffData = await diffResponse.json();
 
       // Set panel title
-      document.getElementById('rightPanelTitle').textContent = t('timeline.version_title', { hash: hash.substring(0, 8) });
+      const commit = allCommits.find(c => c.hash === hash);
+      if (commit && commit.date) {
+        document.getElementById('rightPanelTitle').textContent = formatDateForLabel(commit.date);
+      } else {
+        document.getElementById('rightPanelTitle').textContent = t('timeline.version_title', { hash: hash.substring(0, 8) });
+      }
 
       // Clear actions initially, will be set by displayCommitDiff if there are changes
       document.getElementById('rightPanelActions').innerHTML = '';
 
       // Get commit date from allCommits
-      const commit = allCommits.find(c => c.hash === hash);
-      const commitDate = commit ? commit.date : null;
+      const commitObj = allCommits.find(c => c.hash === hash);
+      const commitDate = commitObj ? commitObj.date : null;
 
       if (diffData.success) {
         await displayCommitDiff(data.status, hash, diffData.diff, commitDate);
