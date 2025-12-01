@@ -2214,7 +2214,6 @@ async function showFileHistory(filePath) {
   }
 
   currentSelection = { type: 'file', file: filePath };
-  // document.getElementById('rightPanel').innerHTML = '<div class="loading">Loading file history...</div>';
 
   try {
     // First get the current file content
@@ -2227,22 +2226,21 @@ async function showFileHistory(filePath) {
     const data = await response.json();
 
     if (data.success) {
-      // Get all commits and filter to only those with actual visible changes from previous version
-      const versionsWithChanges = [];
-      const currentHash = data.currentHash;
+      // Initialize with empty history
+      currentFileHistory = [];
+      currentFileHistoryIndex = 0;
       let lastKeptContent = null;
+      let isFirstVersion = true;
 
-      // Process each version to check for actual content changes from the previous version
+      // Process versions progressively
       for (let i = 0; i < data.log.all.length; i++) {
         const commit = data.log.all[i];
 
-        // Get the commit version content
         try {
           const commitResponse = await fetch(`${API}/git/file-at-commit?filePath=${encodeURIComponent(filePath)}&commitHash=${commit.hash}`);
           const commitData = await commitResponse.json();
           const commitContent = commitData.success ? commitData.content : '';
 
-          // Files tab always uses standard mode - compare against current version
           // Check if there are actual visible differences from the CURRENT version
           const diffVsCurrent = generateDiff(commitContent, currentContent, {
             returnNullIfNoChanges: true,
@@ -2258,31 +2256,32 @@ async function showFileHistory(filePath) {
               returnNullIfNoChanges: true,
               filePath: filePath
             });
-            if (diffVsLast === null) continue; // Skip if identical to the previously added history item
+            if (diffVsLast === null) continue;
           }
 
+          // Add this version to history
           commit.content = commitContent;
-          versionsWithChanges.push(commit);
+          currentFileHistory.push(commit);
           lastKeptContent = commitContent;
+
+          // Display immediately when we find the first valid version
+          if (isFirstVersion) {
+            isFirstVersion = false;
+            displayFileHistory(filePath);
+          } else {
+            // Update the navigation controls for subsequent versions
+            updateFileHistoryNavigation(filePath);
+          }
         } catch (error) {
           console.error(`Error checking commit ${commit.hash}:`, error);
-          // Include it if we can't check (fallback)
-          versionsWithChanges.push(commit);
         }
       }
 
-      currentFileHistory = versionsWithChanges;
-      currentFileHistoryIndex = 0;
-
-      if (currentFileHistory.length > 0) {
-        displayFileHistory(filePath);
-      } else {
-        // No changes found - show empty state
+      // If no versions with changes were found
+      if (currentFileHistory.length === 0) {
         document.getElementById('rightPanel').innerHTML = `<div class="empty">${t('history.no_changes')}</div>`;
         document.getElementById('rightPanelActions').innerHTML = '';
       }
-
-
 
     } else {
       document.getElementById('rightPanel').innerHTML = `<div class="empty">${t('files.failed_to_load_history')}</div>`;
@@ -2290,6 +2289,22 @@ async function showFileHistory(filePath) {
   } catch (error) {
     console.error('Error:', error);
     document.getElementById('rightPanel').innerHTML = `<div class="empty">${t('files.error_loading_history', { error: error.message })}</div>`;
+  }
+}
+
+// Helper function to update navigation controls without reloading the diff
+function updateFileHistoryNavigation(filePath) {
+  const historyPosition = document.getElementById('historyPosition');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  if (historyPosition && prevBtn && nextBtn) {
+    const currentCommit = currentFileHistory[currentFileHistoryIndex];
+    historyPosition.textContent = `Version ${currentFileHistoryIndex + 1} of ${currentFileHistory.length} — ${formatDateForBanner(currentCommit.date)}`;
+
+    // Update button states
+    prevBtn.disabled = currentFileHistoryIndex === 0;
+    nextBtn.disabled = currentFileHistoryIndex === currentFileHistory.length - 1;
   }
 }
 
