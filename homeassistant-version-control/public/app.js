@@ -2255,7 +2255,9 @@ async function showFileHistory(filePath) {
               filePath: filePath
             });
 
-            if (diffVsCurrent === null) continue; // Skip if identical to live
+            // Skip if identical to live, UNLESS it's the latest commit (index 0)
+            // We always want to show the latest state even if it matches current
+            if (diffVsCurrent === null && i !== 0) continue;
 
             // Check against the last kept version to avoid consecutive duplicates
             if (lastKeptContent !== null) {
@@ -2375,7 +2377,8 @@ async function showAutomationHistory(automationId) {
       const versionsWithChanges = [];
       let lastKeptContent = null;
 
-      for (const commit of data.history) {
+      for (let i = 0; i < data.history.length; i++) {
+        const commit = data.history[i];
         const commitContent = dumpYaml(commit.automation);
 
         // In shifted mode, include ALL versions since we compare between consecutive versions
@@ -2393,7 +2396,8 @@ async function showAutomationHistory(automationId) {
             filePath: auto.file
           });
 
-          if (diffVsCurrent === null) continue; // Skip if identical to live
+          // Skip if identical to live, UNLESS it's the latest commit (index 0)
+          if (diffVsCurrent === null && i !== 0) continue;
 
           // Check against the last kept version to avoid consecutive duplicates
           if (lastKeptContent !== null) {
@@ -2637,7 +2641,8 @@ async function showScriptHistory(scriptId) {
       const versionsWithChanges = [];
       let lastKeptContent = null;
 
-      for (const commit of data.history) {
+      for (let i = 0; i < data.history.length; i++) {
+        const commit = data.history[i];
         const commitContent = dumpYaml(commit.script);
 
         // In shifted mode, include ALL versions since we compare between consecutive versions
@@ -2655,7 +2660,8 @@ async function showScriptHistory(scriptId) {
             filePath: script.file
           });
 
-          if (diffVsCurrent === null) continue; // Skip if identical to live
+          // Skip if identical to live, UNLESS it's the latest commit (index 0)
+          if (diffVsCurrent === null && i !== 0) continue;
 
           // Check against the last kept version to avoid consecutive duplicates
           if (lastKeptContent !== null) {
