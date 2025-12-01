@@ -185,13 +185,27 @@ Reset the repository to a specific commit. **WARNING: This is destructive and wi
 #### `POST /api/restore-commit`
 Restore all files to their state at a specific commit. This creates a new commit on top of the current history, preserving history.
 
-**Parameters:**
-*   `commitHash` (string, required): The hash of the commit to restore.
+**Parameters (Option 1 - Simple):**
+*   `commitHash` (string, required): The hash of the commit to restore files from and to.
 
-**Example:**
+**Parameters (Option 2 - Advanced):**
+*   `sourceHash` (string, required): The commit hash to find which files were changed.
+*   `targetHash` (string, required): The commit hash to restore those files to.
+
+> **Note:** Option 2 is used internally by the Timeline's "Diff Change Mode" to restore files to the parent commit version when viewing what a commit changed.
+
+**Example (Simple):**
 ```json
 {
   "commitHash": "e5f6g7h8"
+}
+```
+
+**Example (Advanced):**
+```json
+{
+  "sourceHash": "e5f6g7h8",
+  "targetHash": "a1b2c3d4"
 }
 ```
 
