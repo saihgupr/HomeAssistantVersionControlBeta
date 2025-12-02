@@ -21,7 +21,7 @@ Home Assistant Version Control provides complete version history for your setup.
 ###  Timeline & History
 * **Chronological Feed:** View changes grouped by "Today," "Yesterday," and "Earlier."
 * **Visual Diffs:** Compare the current version against any backup side-by-side. Additions are highlighted in **green**, deletions in **red**.
-* **History Management:** Automatically merges and prunes older snapshots to keep your history clean based on your retention settings.
+* **History Management:** Automatically merges versions older than the specified time period to keep your history clean.
 
 ###  Instant Restore
 * **Granular Control:** Restore specific files or revert your entire configuration.
@@ -29,9 +29,12 @@ Home Assistant Version Control provides complete version history for your setup.
 * **Instant Rollback:** Long-press the restore button to revert the entire system to a previous point in time.
 
 ###  Customization
-* **Accent Colors:** Choose from seven preset color palettes.
+* **Color Theme:** Choose from seven preset color palettes.
 * **Themes:** Toggle between Light and Dark modes.
-* **Diff Viewer:** Customize your diff experience with 8 different styles (High Contrast, GitHub Classic, Neon, etc.) and choose between Unified or Side-by-Side views.
+* **Comparison View:** Customize your comparison experience with 8 different styles (High Contrast, GitHub Classic, Neon, etc.) and choose between Stacked or Side-by-Side layouts.
+* **Comparison Change Mode:**
+  * **On (Default):** Compares your **current live files** against the **version before the selected backup**. This highlights the changes introduced in that backup *plus* any subsequent changes.
+  * **Off:** Compares your **current live files** against the **selected backup**. This shows exactly how your current system differs from that specific point in time.
 
 ---
 

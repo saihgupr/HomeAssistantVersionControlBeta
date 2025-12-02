@@ -1928,7 +1928,7 @@ async function displayCommitDiff(status, hash, diff, commitDate = null) {
       allDiffsHtml += `
         <div class="file-diff-section">
           <div class="file-diff-header ${expandedClass}" onclick="toggleFileDiff(this)">
-            <span class="file-name">${item.file.file}</span>
+            <span class="file-name">${item.file.file} (${item.file.status === 'A' ? 'Added' : item.file.status === 'D' ? 'Deleted' : 'Modified'})</span>
           </div>
           <div class="file-diff-content" style="${displayStyle}">
             <div class="diff-view-container">
@@ -1955,7 +1955,7 @@ async function displayCommitDiff(status, hash, diff, commitDate = null) {
       allDiffsHtml += `
         <div class="file-diff-section">
           <div class="file-diff-header ${expandedClass}" onclick="toggleFileDiff(this)">
-            <span class="file-name">${item.file.file}</span>
+            <span class="file-name">${item.file.file} (${item.file.status === 'A' ? 'Added' : item.file.status === 'D' ? 'Deleted' : 'Modified'})</span>
           </div>
           <div class="file-diff-content" style="${displayStyle}">
             <div class="diff-view-container">
