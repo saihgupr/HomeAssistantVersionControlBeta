@@ -41,7 +41,7 @@
     "files_restored": "Restored {files}!",
     "files_restored_and_reloaded": "{files} restored and reloaded successfully!",
     "single_file_restored": "{file} restored!",
-    "single_file_restored_reloaded": "'{file}' restored and reloaded successfully!",
+    "single_file_restored_reloaded": "{file} restored and reloaded successfully!",
     "multiple_files_restored": "{count} files restored!",
     "multiple_files_restored_reloaded": "{count} files restored and reloaded successfully!"
   },
@@ -76,8 +76,8 @@
     "select_item": "Select an automation to view its history",
     "automation_history": "Automation History",
     "restore_automation": "Restore Automation",
-    "automation_restored": "'{name}' restored!",
-    "automation_restored_reloaded": "'{name}' restored and reloaded successfully!",
+    "automation_restored": "{name} restored!",
+    "automation_restored_reloaded": "{name} restored and reloaded successfully!",
     "automation_restore_error": "Error restoring automation: {error}",
     "deleted_automation": "Deleted Automation"
   },
@@ -91,8 +91,8 @@
     "select_item": "Select a script to view its history",
     "script_history": "Script History",
     "restore_script": "Restore Script",
-    "script_restored": "'{name}' restored!",
-    "script_restored_reloaded": "'{name}' restored and reloaded successfully!",
+    "script_restored": "{name} restored!",
+    "script_restored_reloaded": "{name} restored and reloaded successfully!",
     "script_restore_error": "Error restoring script: {error}",
     "deleted_script": "Deleted Script"
   },
