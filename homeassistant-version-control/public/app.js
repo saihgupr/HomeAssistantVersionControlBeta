@@ -67,7 +67,8 @@ let currentLanguage = 'en';
 
 async function loadLanguage(lang = 'en') {
   try {
-    const response = await fetch(`lang/${lang}.json`);
+    // Add cache-busting parameter to prevent stale cached translations
+    const response = await fetch(`lang/${lang}.json?v=${Date.now()}`);
     if (response.ok) {
       translations = await response.json();
       currentLanguage = lang;

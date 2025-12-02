@@ -121,6 +121,16 @@ app.use((req, res, next) => {
 });
 
 // Static files - serve public directory at root
+// Add cache control headers for JSON files to prevent stale translations
+app.use((req, res, next) => {
+  // Set cache headers for JSON files (translations, etc.) but not API endpoints
+  if (req.url.endsWith('.json') && !req.url.includes('/api/')) {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+  }
+  next();
+});
 app.use(express.static(PUBLIC_DIR));
 
 // Root endpoint
