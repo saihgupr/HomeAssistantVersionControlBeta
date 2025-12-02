@@ -1892,9 +1892,19 @@ async function displayCommitDiff(status, hash, diff, commitDate = null) {
       let leftContent = currentContent;
       let leftLabel = 'Current Version';
 
+      // Determine if we're showing historical content on the left side
+      // In standard mode, left is always current unless it's an Added file in shifted mode
+      // In shifted mode with Added files, we show the commit version on both sides
       if (diffMode === 'shifted' && file.status === 'A') {
         leftContent = commitContent;
         leftLabel = `Version ${hash.substring(0, 8)}`;
+      } else if (diffMode === 'standard') {
+        // In standard mode, check if current content matches the commit content
+        // If they're the same, we're viewing a historical state, not the latest
+        if (currentContent === commitContent && hash !== allCommits[0]?.hash) {
+          // We're viewing an old commit where content hasn't changed since
+          leftLabel = `Version ${hash.substring(0, 8)}`;
+        }
       }
 
       const currentLines = leftContent.split(/\r\n?|\n/);
@@ -1969,7 +1979,7 @@ async function displayCommitDiff(status, hash, diff, commitDate = null) {
             <div class="diff-view-container">
               <div class="segmented-control" style="cursor: default; grid-template-columns: 1fr;">
                 <div class="segmented-control-slider" style="width: calc(100% - 8px);"></div>
-                <label style="cursor: default; color: var(--text-primary);">Current Version</label>
+                <label style="cursor: default; color: var(--text-primary);">Version ${hash.substring(0, 8)}</label>
               </div>
               <div class="diff-viewer-shell ${currentDiffStyle}">
                 <div class="diff-viewer-unified">
@@ -1985,7 +1995,7 @@ async function displayCommitDiff(status, hash, diff, commitDate = null) {
         <div class="diff-view-container">
           <div class="segmented-control" style="cursor: default; grid-template-columns: 1fr;">
             <div class="segmented-control-slider" style="width: calc(100% - 8px);"></div>
-            <label style="cursor: default; color: var(--text-primary);">Current Version</label>
+            <label style="cursor: default; color: var(--text-primary);">Version ${hash.substring(0, 8)}</label>
           </div>
           <div class="diff-viewer-shell ${currentDiffStyle}">
             <div class="diff-viewer-unified">
@@ -3572,7 +3582,7 @@ function generateDiff(oldText, newText, options = {}) {
     return `
       <div class="segmented-control" style="cursor: default; grid-template-columns: 1fr;">
         <div class="segmented-control-slider" style="width: calc(100% - 8px);"></div>
-        <label style="cursor: default; color: var(--text-primary);">Current Version</label>
+        <label style="cursor: default; color: var(--text-primary);">${leftLabel}</label>
       </div>
       <div class="diff-viewer-shell ${currentDiffStyle}">
         <div class="diff-viewer-unified">
