@@ -1609,6 +1609,11 @@ async function displayCommits(commits) {
         // Extract just the filename from the commit message
         let fileName = commit.message;
 
+        // Strip "(Added)" suffix if present (for new files)
+        if (fileName.endsWith(' (Added)')) {
+          fileName = fileName.replace(' (Added)', '');
+        }
+
         // Try to extract filename from various commit message formats
         // Pattern 1: "file1.yaml, file2.yaml" (multiple files)
         if (commit.message.includes(',')) {

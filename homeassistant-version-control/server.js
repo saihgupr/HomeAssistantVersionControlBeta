@@ -274,7 +274,7 @@ let configOptions = {
 
 // Runtime settings loaded from file
 let runtimeSettings = {
-  debounceTime: 1, // time value
+  debounceTime: 5, // time value
   debounceTimeUnit: 'seconds', // 'seconds', 'minutes', 'hours', 'days'
   historyRetention: false,
   retentionType: 'time', // 'time' or 'versions'
@@ -1302,8 +1302,9 @@ function initializeWatcher() {
     }
   });
 
-  watcher.on('change', async (filePath) => {
-    console.log(`File changed: ${filePath}`);
+  // Handler function for both 'change' and 'add' events
+  const handleFileEvent = async (filePath, eventType) => {
+    console.log(`File ${eventType}: ${filePath}`);
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(async () => {
       try {
@@ -1350,6 +1351,10 @@ function initializeWatcher() {
         let commitMessage;
         if (stagedFiles.length === 1) {
           commitMessage = stagedFiles[0];
+          // Add (Added) label if this is a new file
+          if (eventType === 'added') {
+            commitMessage += ' (Added)';
+          }
         } else if (stagedFiles.length === 2) {
           commitMessage = stagedFiles.join(', ');
         } else {
@@ -1376,6 +1381,16 @@ function initializeWatcher() {
         }
       }
     }, getDebounceTimeMs());
+  };
+
+  // Watch for file changes
+  watcher.on('change', async (filePath) => {
+    await handleFileEvent(filePath, 'changed');
+  });
+
+  // Watch for new files being added
+  watcher.on('add', async (filePath) => {
+    await handleFileEvent(filePath, 'added');
   });
 
   watcher.on('ready', () => {
