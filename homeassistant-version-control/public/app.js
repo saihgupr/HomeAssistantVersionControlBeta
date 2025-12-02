@@ -1609,11 +1609,6 @@ async function displayCommits(commits) {
         // Extract just the filename from the commit message
         let fileName = commit.message;
 
-        // Strip "(Added)" suffix if present (for new files)
-        if (fileName.endsWith(' (Added)')) {
-          fileName = fileName.replace(' (Added)', '');
-        }
-
         // Try to extract filename from various commit message formats
         // Pattern 1: "file1.yaml, file2.yaml" (multiple files)
         if (commit.message.includes(',')) {
@@ -1655,6 +1650,10 @@ async function displayCommits(commits) {
             fileName = `${match[1]} files`;
           }
         }
+
+        // Clean up status labels if present (e.g. "file.yaml (Added)")
+        // This ensures the left panel shows clean filenames while the right panel shows status
+        fileName = fileName.replace(/\s+\((Added|Deleted|Modified)\)$/i, '');
 
         html += `
               <div class="commit" onclick="showCommit('${commit.hash}')" id="commit-${commit.hash}">
@@ -1847,8 +1846,30 @@ async function displayCommitDiff(status, hash, diff, commitDate = null) {
       const currentData = await currentResponse.json();
       let currentContent = currentData.success ? currentData.content : '';
 
-      // Get commit version content (use compareHash which may be older commit in shifted mode)
-      const commitResponse = await fetch(`${API}/git/file-at-commit?filePath=${encodeURIComponent(file.file)}&commitHash=${compareHash}`);
+      // Use the new generateDiff function for consistent rendering
+      let rightLabel = `Version ${hash.substring(0, 8)}`;
+
+      // Determine effective comparison hash and label
+      let effectiveCompareHash = compareHash;
+
+      // Special handling for added files in shifted mode:
+      // If a file is ADDED in this commit, we should NOT compare it to the previous commit (where it didn't exist).
+      // Also, we should NOT compare it to the current live version, because if the live version changes later,
+      // the "Added" view would show those future changes, which is confusing.
+      // Instead, we compare the commit against ITSELF. This results in "No changes found",
+      // which our renderer handles by showing the clean file content.
+      if (diffMode === 'shifted') {
+        if (file.status === 'A') {
+          effectiveCompareHash = hash; // Compare to itself
+          // For the "Current" side (left), we also want to show the commit version, not live
+          // This is a special case where we override the "Current" content below
+        } else {
+          rightLabel = `Version ${compareHash.substring(0, 8)}`;
+        }
+      }
+
+      // Get commit version content (use effectiveCompareHash)
+      const commitResponse = await fetch(`${API}/git/file-at-commit?filePath=${encodeURIComponent(file.file)}&commitHash=${effectiveCompareHash}`);
       const commitData = await commitResponse.json();
       let commitContent = commitData.success ? commitData.content : '';
 
@@ -1861,19 +1882,20 @@ async function displayCommitDiff(status, hash, diff, commitDate = null) {
         commitContent = commitContent.substring(commitContent.indexOf('\n') + 1);
       }
 
+      // Special override for Added files in shifted mode:
+      // Force "Current" content (left side) to match "Commit" content (right side)
+      // This ensures a perfect match -> "No changes found" -> Clean file display
+      if (diffMode === 'shifted' && file.status === 'A') {
+        currentContent = commitContent;
+      }
+
       const currentLines = currentContent.split(/\r\n?|\n/);
       const commitLines = commitContent.split(/\r\n?|\n/);
 
-      // Use the new generateDiff function for consistent rendering
-      let rightLabel = `Version ${hash.substring(0, 8)}`;
-      if (diffMode === 'shifted') {
-        rightLabel = `Version ${compareHash.substring(0, 8)}`;
-      }
-
       const diffHtml = generateDiff(currentContent, commitContent, {
-        leftLabel: 'Current Version',
+        leftLabel: (diffMode === 'shifted' && file.status === 'A') ? `Version ${hash.substring(0, 8)}` : 'Current Version',
         rightLabel: rightLabel,
-        bannerText: file.file,
+        bannerText: file.status === 'A' ? `${file.file} (Added)` : file.file,
         returnNullIfNoChanges: true,
         filePath: file.file
       });
@@ -3152,24 +3174,43 @@ async function loadFileHistoryDiff(filePath) {
   const currentContentData = await currentContentResponse.json();
   const currentContent = currentContentData.success ? currentContentData.content : '';
 
+  // Check if this is a newly added file (using status from git log)
+  const isNewlyAdded = currentCommit.status === 'A';
+
   let compareToContent = '';
 
-  // Files tab always uses standard mode - compare current to the version being viewed
-  const commitResponse = await fetch(`${API}/git/file-at-commit?filePath=${encodeURIComponent(filePath)}&commitHash=${currentCommit.hash}`);
-  const commitData = await commitResponse.json();
-  compareToContent = commitData.success ? commitData.content : '';
+  if (isNewlyAdded) {
+    // For newly added files, show a no-change diff (current vs current)
+    // since there's no previous version to compare against
+    compareToContent = currentContent;
 
-  // Always: current on left, compareToContent on right
-  const diffHtml = renderDiff(compareToContent, currentContent, document.getElementById('fileDiffContent'), {
-    leftLabel: 'Current Version',
-    rightLabel: `Version ${currentCommit.hash.substring(0, 8)}`,
-    filePath: filePath
-  });
+    // Show the content as a no-change diff
+    renderDiff(compareToContent, currentContent, document.getElementById('fileDiffContent'), {
+      leftLabel: 'Current Version',
+      rightLabel: 'Current Version',
+      filePath: filePath
+    });
 
-  if (diffHtml) {
-    document.getElementById('rightPanelActions').innerHTML = `<button class="btn restore" onclick="restoreFileVersion('${filePath}')" title="This will overwrite the current file with this version">Confirm Restore</button>`;
-  } else {
+    // Don't show restore button for newly added files (can't restore to non-existent state)
     document.getElementById('rightPanelActions').innerHTML = '';
+  } else {
+    // Normal files: compare current to the version being viewed
+    const commitResponse = await fetch(`${API}/git/file-at-commit?filePath=${encodeURIComponent(filePath)}&commitHash=${currentCommit.hash}`);
+    const commitData = await commitResponse.json();
+    compareToContent = commitData.success ? commitData.content : '';
+
+    // Always: current on left, compareToContent on right
+    const diffHtml = renderDiff(compareToContent, currentContent, document.getElementById('fileDiffContent'), {
+      leftLabel: 'Current Version',
+      rightLabel: `Version ${currentCommit.hash.substring(0, 8)}`,
+      filePath: filePath
+    });
+
+    if (diffHtml) {
+      document.getElementById('rightPanelActions').innerHTML = `<button class="btn restore" onclick="restoreFileVersion('${filePath}')" title="This will overwrite the current file with this version">Confirm Restore</button>`;
+    } else {
+      document.getElementById('rightPanelActions').innerHTML = '';
+    }
   }
 }
 

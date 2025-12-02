@@ -1351,10 +1351,6 @@ function initializeWatcher() {
         let commitMessage;
         if (stagedFiles.length === 1) {
           commitMessage = stagedFiles[0];
-          // Add (Added) label if this is a new file
-          if (eventType === 'added') {
-            commitMessage += ' (Added)';
-          }
         } else if (stagedFiles.length === 2) {
           commitMessage = stagedFiles.join(', ');
         } else {

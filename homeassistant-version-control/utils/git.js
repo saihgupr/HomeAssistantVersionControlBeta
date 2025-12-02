@@ -43,14 +43,16 @@ export async function gitLog(options = {}) {
     const DELIMITER = '§§§§';
     const COMMIT_DELIMITER = '±±±±';
 
+    // Put delimiter at the START so we can capture the file status that comes after the body
     const args = [
         'log',
         `--max-count=${maxCount}`,
         '--date=iso',
-        `--pretty=format:%H${DELIMITER}%h${DELIMITER}%an${DELIMITER}%ae${DELIMITER}%at${DELIMITER}%s${DELIMITER}%b${COMMIT_DELIMITER}`
+        `--pretty=format:${COMMIT_DELIMITER}%H${DELIMITER}%h${DELIMITER}%an${DELIMITER}%ae${DELIMITER}%at${DELIMITER}%s${DELIMITER}%b`
     ];
 
     if (file) {
+        args.push('--name-status'); // Include file status (A, M, D)
         args.push('--', file);
     }
 
@@ -60,9 +62,17 @@ export async function gitLog(options = {}) {
         return { all: [], latest: null, total: 0 };
     }
 
+    // Split by delimiter (skip the first empty element if string starts with delimiter)
     const rawCommits = stdout.split(COMMIT_DELIMITER).filter(c => c.trim());
 
     const commits = rawCommits.map(rawCommit => {
+        // The rawCommit string contains the formatted part AND the status lines (if any)
+        // We need to separate them. The formatted part ends with the last field (%b)
+        // But since %b can contain anything, we rely on the delimiters.
+
+        // Actually, since we split by COMMIT_DELIMITER, rawCommit is:
+        // HASH§...§BODY\n\nSTATUS_LINES
+
         const parts = rawCommit.split(DELIMITER);
         const hash = parts[0] ? parts[0].trim() : '';
         const short = parts[1] ? parts[1].trim() : '';
@@ -70,7 +80,28 @@ export async function gitLog(options = {}) {
         const authorEmail = parts[3] ? parts[3].trim() : '';
         const timestamp = parts[4] ? parts[4].trim() : '';
         const subject = parts[5] ? parts[5].trim() : '';
-        const body = parts[6] || '';
+
+        // The last part contains BODY + STATUS lines
+        let bodyAndStatus = parts[6] || '';
+        let body = bodyAndStatus;
+        let status = null;
+
+        // If we requested file status, try to extract it
+        if (file) {
+            // The status line looks like "M\tfilename" or "A\tfilename"
+            // It appears after the body, separated by newlines.
+            // Since we filtered by specific file, we look for that file's status
+            // But simpler: look for the last line that matches status format
+            const lines = bodyAndStatus.trim().split('\n');
+            const lastLine = lines[lines.length - 1];
+
+            // Check if last line looks like a status line (e.g. "M\tfile.yaml" or "A\tfile.yaml")
+            if (lastLine && /^[AMD]\s+/.test(lastLine)) {
+                status = lastLine.charAt(0); // 'A', 'M', or 'D'
+                // Remove status line from body
+                body = lines.slice(0, -1).join('\n').trim();
+            }
+        }
 
         return {
             hash,
@@ -79,7 +110,8 @@ export async function gitLog(options = {}) {
             authorEmail,
             date: new Date(parseInt(timestamp) * 1000).toISOString(),
             message: subject,
-            body: body.trim()
+            body: body.trim(),
+            status: status // 'A' = Added, 'M' = Modified, 'D' = Deleted, null = unknown
         };
     });
 
