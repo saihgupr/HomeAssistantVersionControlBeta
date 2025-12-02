@@ -149,23 +149,8 @@
 
           <!-- Group 2: General -->
           <div class="settings-group">
-            <div class="settings-group-title">General</div>
+            <div class="settings-group-title" data-i18n="settings.group_general">General</div>
 
-            <div class="setting-item" style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px;">
-                <span style="color: var(--text-primary); font-size: 14px;"
-                  data-i18n="settings.config_folder_path">Config Folder Path</span>
-              </label>
-              <input type="text" id="configFolderPath" value="/config" style="
-                width: 100%;
-                padding: 10px 12px;
-                background: var(--bg-tertiary);
-                border: 1px solid var(--border-subtle);
-                border-radius: var(--radius-md);
-                color: var(--text-primary);
-                font-size: 14px;
-              ">
-            </div>
 
             <div id="debounceTimeOptions" style="margin-bottom: 20px;">
               <label style="display: block; margin-bottom: 8px;">
@@ -296,20 +281,21 @@
 
           <!-- Group 3: Diff Viewer -->
           <div class="settings-group">
-            <div class="settings-group-title">Diff Viewer</div>
+            <div class="settings-group-title" data-i18n="settings.group_diff_viewer">Diff Viewer</div>
 
             <div class="setting-item"
               style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
               <label style="margin-bottom: 0;">
-                <span style="color: var(--text-primary); font-size: 14px;">Diff View</span>
+                <span style="color: var(--text-primary); font-size: 14px;" data-i18n="settings.diff_view">Diff
+                  View</span>
               </label>
               <div class="segmented-control">
                 <input type="radio" name="diffViewFormat" id="diffViewUnified" value="unified"
                   onchange="toggleDiffViewFormat(false)">
-                <label for="diffViewUnified">Unified</label>
+                <label for="diffViewUnified" data-i18n="settings.diff_view_unified">Unified</label>
                 <input type="radio" name="diffViewFormat" id="diffViewSplit" value="split" checked
                   onchange="toggleDiffViewFormat(true)">
-                <label for="diffViewSplit">Side-by-Side</label>
+                <label for="diffViewSplit" data-i18n="settings.diff_view_split">Side-by-Side</label>
                 <div class="segmented-control-slider"></div>
               </div>
             </div>
@@ -317,7 +303,8 @@
             <div class="setting-item"
               style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
               <label style="margin-bottom: 0;">
-                <span style="color: var(--text-primary); font-size: 14px;">Diff Style</span>
+                <span style="color: var(--text-primary); font-size: 14px;" data-i18n="settings.diff_style">Diff
+                  Style</span>
               </label>
               <select id="diffStyle" onchange="switchDiffStyle(this.value)" style="
                 width: auto;
@@ -338,22 +325,24 @@
                 text-align: left;
                 cursor: pointer;
               ">
-                <option value="style-2">High Contrast</option>
-                <option value="style-1">GitHub Classic</option>
-                <option value="style-3">Modern Gradient</option>
-                <option value="style-4">Terminal</option>
-                <option value="style-5">Neon</option>
-                <option value="style-6">Pastel</option>
-                <option value="style-7">Minimal Border</option>
-                <option value="style-8">Split Highlight</option>
+                <option value="style-2" data-i18n="settings.diff_style_high_contrast">High Contrast</option>
+                <option value="style-1" data-i18n="settings.diff_style_github">GitHub Classic</option>
+                <option value="style-3" data-i18n="settings.diff_style_gradient">Modern Gradient</option>
+                <option value="style-4" data-i18n="settings.diff_style_terminal">Terminal</option>
+                <option value="style-5" data-i18n="settings.diff_style_neon">Neon</option>
+                <option value="style-6" data-i18n="settings.diff_style_pastel">Pastel</option>
+                <option value="style-7" data-i18n="settings.diff_style_minimal">Minimal Border</option>
+                <option value="style-8" data-i18n="settings.diff_style_split">Split Highlight</option>
               </select>
             </div>
 
             <div class="setting-item" style="margin-bottom: 20px;">
               <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
                 <div style="display: flex; flex-direction: column;">
-                  <span style="color: var(--text-primary); font-size: 14px;">Diff Change Mode</span>
-                  <span style="color: var(--text-secondary); font-size: 12px; margin-top: 4px;">
+                  <span style="color: var(--text-primary); font-size: 14px;" data-i18n="settings.diff_change_mode">Diff
+                    Change Mode</span>
+                  <span style="color: var(--text-secondary); font-size: 12px; margin-top: 4px;"
+                    data-i18n="settings.diff_change_mode_desc">
                     Show what changed in each version
                   </span>
                 </div>
@@ -368,7 +357,7 @@
 
           <!-- Group 3: Appearance -->
           <div class="settings-group">
-            <div class="settings-group-title">Appearance</div>
+            <div class="settings-group-title" data-i18n="settings.group_appearance">Appearance</div>
 
             <div class="setting-item"
               style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">

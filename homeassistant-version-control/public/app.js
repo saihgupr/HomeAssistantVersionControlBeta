@@ -192,10 +192,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   // Load other settings that are not in runtime settings
 
 
-  const configFolderPath = localStorage.getItem('configFolderPath');
-  if (configFolderPath) {
-    document.getElementById('configFolderPath').value = configFolderPath;
-  }
 
   // Initialize the UI state
   handleRetentionToggle();
@@ -946,12 +942,7 @@ function refreshCurrentView() {
 // Settings modal functions
 function openSettings() {
   const settingsModal = document.getElementById('settingsModal');
-  if (settingsModal) {
-    const configFolderPathSetting = document.getElementById('configFolderPath').closest('.setting');
-    if (configFolderPathSetting) {
-      settingsModal.querySelector('.modal-content').prepend(configFolderPathSetting);
-    }
-  }
+
   document.getElementById('settingsModal').classList.add('active');
 }
 
@@ -964,7 +955,7 @@ async function saveSettings() {
   const darkMode = document.getElementById('themeDark').checked;
   const debounceTime = document.getElementById('debounceTime').value;
   const debounceTimeUnit = document.getElementById('debounceTimeUnit').value;
-  const configFolderPath = document.getElementById('configFolderPath').value;
+
   const retentionType = 'time'; // Hardcoded as UI option removed
   const retentionValue = document.getElementById('retentionValue').value;
   const retentionUnit = document.getElementById('retentionUnit').value;
@@ -977,7 +968,7 @@ async function saveSettings() {
   localStorage.setItem('darkMode', darkMode);
   localStorage.setItem('debounceTime', debounceTime);
   localStorage.setItem('debounceTimeUnit', debounceTimeUnit);
-  localStorage.setItem('configFolderPath', configFolderPath);
+
   localStorage.setItem('retentionType', retentionType);
   localStorage.setItem('retentionValue', retentionValue);
   localStorage.setItem('retentionUnit', retentionUnit);
