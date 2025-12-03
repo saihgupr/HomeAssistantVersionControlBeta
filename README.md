@@ -104,9 +104,6 @@ docker run -d \
 
 Replace `/path/to/your/config` with the actual path to your Home Assistant configuration directory.
 
-> [!NOTE]
-> The `SUPERVISOR_TOKEN` and `HA_URL` are optional. You can omit those lines if you don't need Home Assistant restart/reload features. See [Configuration for Docker Mode](#configuration-for-docker-mode-optional) for details.
-
 **Option C: Build locally:**
 
 ```bash
@@ -125,60 +122,9 @@ docker run -d \
 ```
 
 > [!NOTE]
-> The `SUPERVISOR_TOKEN` and `HA_URL` are optional. You can omit those lines if you don't need Home Assistant restart/reload features. See [Configuration for Docker Mode](#configuration-for-docker-mode-optional) for details.
+> The `SUPERVISOR_TOKEN` and `HA_URL` are optional. You can omit those lines if you don't need Home Assistant restart/reload features.
 
 Access the interface at `http://localhost:54001`.
-
-#### Configuration for Docker Mode (Optional)
-
-When running as a standalone Docker container, two environment variables enable Home Assistant API features:
-
-**Without these variables**, all version control features work normally:
-- ✅ Automatic backups and version tracking
-- ✅ Browse history and view diffs
-- ✅ Restore files and entire configurations
-- ❌ Cannot restart Home Assistant from the UI
-- ❌ Automations won't auto-reload after restore (manual reload needed)
-- ❌ Scripts won't auto-reload after restore (manual reload needed)
-
-**With both variables configured**, you additionally get:
-- ✅ Restart Home Assistant from the UI
-- ✅ Auto-reload automations after restore
-- ✅ Auto-reload scripts after restore
-
-**Required Variables for Docker Mode:**
-
-1. **`SUPERVISOR_TOKEN`** - A Home Assistant long-lived access token
-   - Go to **Settings** → **People** → click on your user profile
-   - Scroll down to **Long-Lived Access Tokens**
-   - Click **Create Token** and give it a name (e.g., "Version Control")
-   - Copy the token
-
-2. **`HA_URL`** - The URL to your Home Assistant instance
-   - Format: `http://homeassistant.local:8123` or `http://192.168.1.100:8123`
-   - Use the hostname or IP address that the Docker container can reach
-   - Include the port (usually 8123)
-
-**To add these variables:**
-
-**For `docker run`**, add these lines to your command:
-```bash
--e SUPERVISOR_TOKEN=your_token_here \
--e HA_URL=http://homeassistant.local:8123 \
-```
-
-**For `docker compose`**, update these lines in `compose.yaml`:
-```yaml
-- SUPERVISOR_TOKEN=your_long_lived_access_token_here
-- HA_URL=http://homeassistant.local:8123
-```
-
-> [!IMPORTANT]
-> After updating the `compose.yaml` file, restart the container with:
-> ```bash
-> docker compose down
-> docker compose up -d
-> ```
 
 ---
 
@@ -194,7 +140,7 @@ When running as a standalone Docker container, two environment variables enable 
 ### The Workflow
 1.  **File Watcher:** The system continuously monitors your `/config` folder for changes to YAML files.
 2.  **Stabilization:** When a change is detected, it waits **2 seconds** to ensure Home Assistant has finished writing the file (preventing corruption).
-3.  **Debounce:** It then waits for your configured **Debounce Time** (default 1s) to batch related edits into a single commit.
+3.  **Debounce:** It then waits for your configured **Debounce Time** (default 5s) to batch related edits into a single commit.
 4.  **Snapshot:** A Git commit is created with a timestamp.
 5.  **Cleanup:** If enabled, old snapshots are consolidated periodically.
 

@@ -96,6 +96,8 @@ docker run -d \
   -p 54001:54001 \
   -v /path/to/your/config:/config \
   -e TZ=America/New_York \
+  -e SUPERVISOR_TOKEN=your_long_lived_access_token_here \
+  -e HA_URL=http://homeassistant.local:8123 \
   --name home-assistant-version-control \
   ghcr.io/saihgupr/ha-version-control:latest
 ```
@@ -113,9 +115,14 @@ docker run -d \
   -p 54001:54001 \
   -v /path/to/your/config:/config \
   -e TZ=America/New_York \
+  -e SUPERVISOR_TOKEN=your_long_lived_access_token_here \
+  -e HA_URL=http://homeassistant.local:8123 \
   --name home-assistant-version-control \
   home-assistant-version-control
 ```
+
+> [!NOTE]
+> The `SUPERVISOR_TOKEN` and `HA_URL` are optional. You can omit those lines if you don't need Home Assistant restart/reload features.
 
 Access the interface at `http://localhost:54001`.
 
@@ -133,7 +140,7 @@ Access the interface at `http://localhost:54001`.
 ### The Workflow
 1.  **File Watcher:** The system continuously monitors your `/config` folder for changes to YAML files.
 2.  **Stabilization:** When a change is detected, it waits **2 seconds** to ensure Home Assistant has finished writing the file (preventing corruption).
-3.  **Debounce:** It then waits for your configured **Debounce Time** (default 1s) to batch related edits into a single commit.
+3.  **Debounce:** It then waits for your configured **Debounce Time** (default 5s) to batch related edits into a single commit.
 4.  **Snapshot:** A Git commit is created with a timestamp.
 5.  **Cleanup:** If enabled, old snapshots are consolidated periodically.
 
