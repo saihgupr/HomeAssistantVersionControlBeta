@@ -4102,7 +4102,10 @@ function expandDiffContext(expanderId, startLine, endLine, diffId, offset = 0, f
   // Adjust slicing for offset
   const startIndex = Math.max(0, startLine - 1 - offset);
   const endIndex = Math.max(0, endLine - offset);
-  const contextLines = lines.slice(startIndex, endIndex);
+  let contextLines = lines.slice(startIndex, endIndex);
+
+  // Remove empty lines from top and bottom
+  contextLines = trimEmptyLines(contextLines);
 
   // Build HTML for context lines
   let contextHtml = '';

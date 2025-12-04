@@ -1,4 +1,4 @@
-# Home Assistant Version Control Beta
+# Home Assistant Version Control Beta..
 
 **Automatic backup, history tracking, and instant restore for your Home Assistant configuration.**
 
