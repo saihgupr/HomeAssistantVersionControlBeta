@@ -110,7 +110,7 @@
   "restore_preview": {
     "title": "Preview Restore",
     "loading_preview": "Loading preview...",
-    "confirm_restore": "Confirm Restore",
+    "confirm_restore": "Restore This Version",
     "unknown_restore_type": "Unknown restore type",
     "no_restore_data": "No restore data available"
   },
