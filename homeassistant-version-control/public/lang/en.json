@@ -65,7 +65,11 @@
     "error_loading_history": "Error loading file history: {error}",
     "restore_file": "Restore File",
     "file_restored": "{file} Restored!",
-    "file_restore_error": "Error restoring file: {error}"
+    "file_restore_error": "Error restoring file: {error}",
+    "view_button": "View",
+    "restore_button": "Restore",
+    "restore_tooltip": "Restore this file to the version from this commit",
+    "folder_label": "Folder"
   },
   "automations": {
     "title": "Automations",
@@ -103,17 +107,28 @@
     "backup_version": "Backup Version",
     "restore_this_file": "Restore This File",
     "loading_diff": "Loading diff...",
-    "no_changes": "No changes detected",
+    "no_changes": "No changes",
+    "no_changes_detected": "No changes detected",
     "no_diff_available": "No diff available",
     "binary_file": "Binary file (cannot show diff)",
-    "large_diff": "Diff too large to display"
+    "large_diff": "Diff too large to display",
+    "file_empty": "File is empty",
+    "content_not_available": "Content not available"
   },
   "restore_preview": {
     "title": "Preview Restore",
     "loading_preview": "Loading preview...",
     "confirm_restore": "Restore This Version",
     "unknown_restore_type": "Unknown restore type",
-    "no_restore_data": "No restore data available"
+    "no_restore_data": "No restore data available",
+    "cancel": "Cancel",
+    "move_up": "Move Up",
+    "move_down": "Move Down",
+    "move_left": "Move Left",
+    "move_right": "Move Right",
+    "reset_all_title": "Reset All Files?",
+    "reset_all_message": "This will reset all files back to {date}.",
+    "move_button_title": "Move Button"
   },
   "settings": {
     "dark_mode": "Dark Mode",

@@ -659,15 +659,15 @@ function createArrowControls() {
   arrowControls.id = 'arrowControls';
   arrowControls.className = 'arrow-controls';
   arrowControls.innerHTML = `
-  < div class="arrow-control-title" > Move Button</div >
+  < div class="arrow-control-title" > ${t('restore_preview.move_button_title')}</div >
         <div class="arrow-pad">
-          <button class="arrow-btn arrow-up" onclick="moveConfirmRestoreButton('up')" title="Move Up">▲</button>
+          <button class="arrow-btn arrow-up" onclick="moveConfirmRestoreButton('up')" title="${t('restore_preview.move_up')}">▲</button>
           <div class="arrow-middle-row">
-            <button class="arrow-btn arrow-left" onclick="moveConfirmRestoreButton('left')" title="Move Left">◀</button>
+            <button class="arrow-btn arrow-left" onclick="moveConfirmRestoreButton('left')" title="${t('restore_preview.move_left')}">◀</button>
             <button class="arrow-btn arrow-center" disabled>●</button>
-            <button class="arrow-btn arrow-right" onclick="moveConfirmRestoreButton('right')" title="Move Right">▶</button>
+            <button class="arrow-btn arrow-right" onclick="moveConfirmRestoreButton('right')" title="${t('restore_preview.move_right')}">▶</button>
           </div>
-          <button class="arrow-btn arrow-down" onclick="moveConfirmRestoreButton('down')" title="Move Down">▼</button>
+          <button class="arrow-btn arrow-down" onclick="moveConfirmRestoreButton('down')" title="${t('restore_preview.move_down')}">▼</button>
         </div>
         <div class="arrow-control-info">
           X: ${buttonPosition.x}px | Y: ${buttonPosition.y}px
@@ -1774,8 +1774,8 @@ function displayFiles(status, hash) {
             <div class="file-path-text">${file.status === 'A' ? t('file_status.added') : file.status === 'D' ? t('file_status.deleted') : t('file_status.modified')}</div>
           </div>
           <div>
-            <button class="btn" onclick="viewDiff('${file.file}', '${hash}')">View</button>
-            <button class="btn restore" onclick="restoreFile('${file.file}', '${hash}')" title="Restore this file to the version from this commit">Restore</button>
+            <button class="btn" onclick="viewDiff('${file.file}', '${hash}')">${t('files.view_button')}</button>
+            <button class="btn restore" onclick="restoreFile('${file.file}', '${hash}')" title="${t('files.restore_tooltip')}">${t('files.restore_button')}</button>
           </div>
         </div>
       `).join('');
@@ -2212,7 +2212,7 @@ function displayFileList(files) {
               <div class="file-icon"></div>
               <div class="file-path">
                 <div class="file-name">${item.name}</div>
-                <div class="file-path-text">Folder</div>
+                <div class="file-path-text">${t('files.folder_label')}</div>
               </div>
               <div class="folder-chevron">›</div>
             </div>
@@ -4094,7 +4094,7 @@ function expandDiffContext(expanderId, startLine, endLine, diffId, offset = 0, f
 
   // If no stored content, can't expand
   if (!content) {
-    expander.textContent = 'Content not available';
+    expander.textContent = t('diff.content_not_available');
     return;
   }
 
@@ -4247,7 +4247,7 @@ async function showRestorePreview(filePath, commitHash, commitDate) {
     const diffHtml = generateClippedDiffHTML(currentLines, commitLines, 3);
 
 
-    document.getElementById('restoreDiffContent').innerHTML = diffHtml || '<div class="empty">File is empty</div>';
+    document.getElementById('restoreDiffContent').innerHTML = diffHtml || `<div class="empty">${t('diff.file_empty')}</div>`;
 
     // Store data for restore
     restorePreviewData = { filePath, commitHash };
@@ -4309,7 +4309,7 @@ async function showAutomationRestorePreview(automationId, commitHash, commitDate
     const commitLines = commitContent.split(/\r\n?|\n/);
     const diffHtml = generateClippedDiffHTML(currentLines, commitLines, 3);
 
-    document.getElementById('restoreDiffContent').innerHTML = diffHtml || '<div class="empty">No changes</div>';
+    document.getElementById('restoreDiffContent').innerHTML = diffHtml || `<div class="empty">${t('diff.no_changes')}</div>`;
 
     // Store data for restore
     restorePreviewData = { automationId, commitHash };
@@ -4371,7 +4371,7 @@ async function showScriptRestorePreview(scriptId, commitHash, commitDate) {
     const commitLines = commitContent.split(/\r\n?|\n/);
     const diffHtml = generateClippedDiffHTML(currentLines, commitLines, 3);
 
-    document.getElementById('restoreDiffContent').innerHTML = diffHtml || '<div class="empty">No changes</div>';
+    document.getElementById('restoreDiffContent').innerHTML = diffHtml || `<div class="empty">${t('diff.no_changes')}</div>`;
 
     // Store data for restore
     restorePreviewData = { scriptId, commitHash };
@@ -4464,7 +4464,7 @@ async function showCommitRestorePreview(commitHash, commitDate) {
     if (allDiffsHtml) {
       document.getElementById('restoreDiffContent').innerHTML = allDiffsHtml;
     } else {
-      document.getElementById('restoreDiffContent').innerHTML = '<div class="empty">No changes detected</div>';
+      document.getElementById('restoreDiffContent').innerHTML = `<div class="empty">${t('diff.no_changes_detected')}</div>`;
     }
 
     // Store data for restore
@@ -4835,13 +4835,13 @@ function showHardResetConfirmation(hash) {
   const modalHTML = `
     <div class="modal-backdrop active" id="hard-reset-modal" onclick="if(event.target === this) closeHardResetModal()">
       <div class="modal-content hard-reset-dialog">
-        <h3>Reset All Files?</h3>
+        <h3>${t('restore_preview.reset_all_title')}</h3>
         
-        <p>This will reset all files back to ${formattedDate}.</p>
+        <p>${t('restore_preview.reset_all_message', { date: formattedDate })}</p>
         
         <div class="modal-actions">
-          <button class="btn btn-secondary" onclick="closeHardResetModal()">Cancel</button>
-          <button class="btn btn-danger" onclick="confirmHardReset('${hash}')">Reset All Files</button>
+          <button class="btn btn-secondary" onclick="closeHardResetModal()">${t('restore_preview.cancel')}</button>
+          <button class="btn btn-danger" onclick="confirmHardReset('${hash}')">${t('timeline.reset_all_files')}</button>
         </div>
       </div>
     </div>
