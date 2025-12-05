@@ -1089,35 +1089,57 @@ function toggleDarkMode() {
 function getDateBucket(dateString) {
   const date = new Date(dateString);
   const now = new Date();
+
+  // Reset times to compare dates only
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
   const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
 
   const commitDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
+  // 1. Today
   if (commitDate.getTime() === today.getTime()) {
     return t('date_buckets.today');
-  } else if (commitDate.getTime() === yesterday.getTime()) {
-    return t('date_buckets.yesterday');
-  } else if (date > weekAgo) {
-    return t('date_buckets.this_week');
-  } else {
-    return t('date_buckets.earlier');
   }
+
+  // 2. Yesterday
+  if (commitDate.getTime() === yesterday.getTime()) {
+    return t('date_buckets.yesterday');
+  }
+
+  // 3. This Week (Last 7 days, excluding Today/Yesterday)
+  if (commitDate > weekAgo) {
+    return t('date_buckets.this_week');
+  }
+
+  // 4. This Month (Same month/year, excluding last week)
+  if (date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()) {
+    return t('date_buckets.this_month');
+  }
+
+  // 5. Current Year -> Month Name (e.g. November)
+  if (date.getFullYear() === now.getFullYear()) {
+    return date.toLocaleString('default', { month: 'long' });
+  }
+
+  // 6. Previous Years -> Year (e.g. 2024)
+  return date.getFullYear().toString();
 }
 
 function groupCommitsByDate(commits) {
   const groups = {};
+  const bucketOrder = []; // Keep track of the order we see buckets
 
   commits.forEach(commit => {
     const bucket = getDateBucket(commit.date);
     if (!groups[bucket]) {
       groups[bucket] = [];
+      bucketOrder.push(bucket); // Add new bucket to order list
     }
     groups[bucket].push(commit);
   });
 
-  return groups;
+  return { groups, bucketOrder };
 }
 
 function formatDateDisplay(bucket) {
@@ -1621,19 +1643,32 @@ async function displayCommits(commits) {
     console.log(`[Filter] Filtered ${commits.length} commits down to ${filteredCommits.length} with changes`);
   }
 
-  const groups = groupCommitsByDate(filteredCommits);
+  const { groups, bucketOrder } = groupCommitsByDate(filteredCommits);
 
-  const buckets = ['Today', 'Yesterday', 'This Week', 'Earlier'];
   let html = '';
 
-  for (const bucket of buckets) {
+  for (const bucket of bucketOrder) {
     if (groups[bucket] && groups[bucket].length > 0) {
+      // For dynamic buckets (Month names), we display them as is
+      // For static buckets (Today/Yesterday/...), formatDateDisplay handles translation if needed
+      // But since our keys are already translated strings from getDateBucket, we can just use the bucket name
+      const displayName = bucket;
+
+      // Determine if expanded by default (Today, Yesterday, This Week)
+      const isExpanded = [
+        t('date_buckets.today'),
+        t('date_buckets.yesterday'),
+        t('date_buckets.this_week')
+      ].includes(bucket);
+
+      const collapsedClass = isExpanded ? '' : 'collapsed';
+
       html += `
             <div class="date-group">
-              <div class="date-header" onclick="toggleDateGroup('${bucket}')" id="header-${bucket}">
-                ${formatDateDisplay(bucket)} (${groups[bucket].length})
+              <div class="date-header ${collapsedClass}" onclick="toggleDateGroup('${bucket}')" id="header-${bucket}">
+                ${displayName} (${groups[bucket].length})
               </div>
-              <div class="date-content" id="content-${bucket}">
+              <div class="date-content ${collapsedClass}" id="content-${bucket}">
           `;
 
       for (const commit of groups[bucket]) {
