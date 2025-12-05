@@ -1377,8 +1377,9 @@ async function switchMode(mode) {
     leftPanelTitle.setAttribute('data-i18n', 'timeline.title');
     searchInput.placeholder = t('timeline.search_placeholder');
     searchInput.setAttribute('data-i18n', 'timeline.search_placeholder');
-    rightPanelTitle.textContent = t('timeline.files_in_commit');
-    rightPanelTitle.setAttribute('data-i18n', 'timeline.files_in_commit');
+    // Clear title initially - it will be set when a commit is selected
+    rightPanelTitle.textContent = '';
+    rightPanelTitle.removeAttribute('data-i18n');
     await loadTimeline();
   }
 
