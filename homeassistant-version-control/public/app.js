@@ -759,9 +759,19 @@ function handleKeyboardNavigation(event) {
   }
 
   // Navigate and select the item
-  // In Files tab, don't auto-trigger click to avoid auto-navigating into folders
-  // In other tabs, trigger click to show content in right panel
-  const shouldTriggerClick = keyboardNav.currentList !== 'files';
+  // In Files tab, don't auto-trigger click for folders to avoid auto-navigating into folders
+  // But DO triggering click for files so they can be previewed
+  let shouldTriggerClick = keyboardNav.currentList !== 'files';
+
+  if (keyboardNav.currentList === 'files' && keyboardNav.items[newIndex]) {
+    // Only trigger click if it is NOT a folder
+    // Folders have the .folder-chevron class
+    const isFolder = keyboardNav.items[newIndex].querySelector('.folder-chevron');
+    if (!isFolder) {
+      shouldTriggerClick = true;
+    }
+  }
+
   selectListItem(newIndex, shouldTriggerClick);
 }
 
