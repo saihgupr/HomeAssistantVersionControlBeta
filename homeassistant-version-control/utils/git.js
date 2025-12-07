@@ -258,3 +258,13 @@ export async function gitRmCached(path) {
         return false;
     }
 }
+
+export async function gitResetHead(path) {
+    try {
+        await gitExec(['reset', 'HEAD', '--', path]);
+        return true;
+    } catch (e) {
+        // Ignore errors if path doesn't exist in HEAD
+        return false;
+    }
+}

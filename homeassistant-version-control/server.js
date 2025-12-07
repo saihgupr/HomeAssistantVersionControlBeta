@@ -1,4 +1,3 @@
-
 import express from 'express';
 import {
   gitLog,
@@ -16,8 +15,8 @@ import {
   gitCheckout,
   gitBranch,
   gitRevparse,
-  gitRmCached
-
+  gitRmCached,
+  gitResetHead
 } from './utils/git.js';
 import chokidar from 'chokidar';
 import fs from 'fs';
@@ -703,6 +702,20 @@ async function initRepo() {
       }
     }
 
+    // Clean up nested repos from index BEFORE doing git add
+    // This prevents them from being re-committed in the startup backup
+    if (nestedRepos.length > 0) {
+      console.log('[init] Cleaning up nested git repositories from index...');
+      for (const repoPath of nestedRepos) {
+        // Ensure path uses forward slashes for git command
+        const gitPath = repoPath.replace(/\\/g, '/');
+        const removed = await gitRmCached(gitPath);
+        if (removed) {
+          console.log(`[init] Removed nested git repo from index (cached only): ${gitPath}`);
+        }
+      }
+    }
+
     // Create a startup commit to backup current state (only for existing repos)
     if (isRepo) {
       console.log('[init] Creating startup backup commit for existing repository...');
@@ -719,6 +732,17 @@ async function initRepo() {
           console.log(`[init] Added all files (forced)`);
         } else {
           throw error;
+        }
+      }
+
+      // After git add, unstage any nested repos to prevent them from being committed
+      // This handles both re-additions (as submodules) and deletions staged by git rm --cached
+      if (nestedRepos.length > 0) {
+        console.log('[init] Unstaging nested git repositories after git add...');
+        for (const repoPath of nestedRepos) {
+          const gitPath = repoPath.replace(/\\/g, '/');
+          await gitResetHead(gitPath);
+          console.log(`[init] Unstaged nested repo: ${gitPath}`);
         }
       }
 
@@ -743,19 +767,6 @@ async function initRepo() {
       }
     } else {
       console.log('[init] No changes to backup for existing repository');
-    }
-
-    // Clean up nested repos from index if they exist
-    if (nestedRepos.length > 0) {
-      console.log('[init] Cleaning up nested git repositories from index...');
-      for (const repoPath of nestedRepos) {
-        // Ensure path uses forward slashes for git command
-        const gitPath = repoPath.replace(/\\/g, '/');
-        const removed = await gitRmCached(gitPath);
-        if (removed) {
-          console.log(`[init] Removed nested git repo from index (cached only): ${gitPath}`);
-        }
-      }
     }
 
     gitInitialized = true;
