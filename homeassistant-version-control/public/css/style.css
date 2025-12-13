@@ -1009,7 +1009,7 @@ input:checked+.toggle-slider:before {
 .line-number {
   color: var(--text-tertiary);
   font-size: 11px;
-  width: 28px;
+  width: clamp(20px, 3vw, 28px);
   text-align: right;
   user-select: none;
   flex-shrink: 0;
@@ -1230,9 +1230,9 @@ input:checked+.toggle-slider:before {
   }
 
   .diff-line .line-num {
-    width: 30px;
-    padding-right: 8px;
-    margin-right: 8px;
+    width: clamp(20px, 4vw, 30px);
+    padding-right: 6px;
+    margin-right: 6px;
   }
 }
 
@@ -1567,7 +1567,7 @@ body.dark-mode .color-circle.selected {
 }
 
 .diff-viewer-unified .diff-line-marker {
-  width: 24px;
+  width: clamp(12px, 2vw, 24px);
   flex-shrink: 0;
   text-align: center;
   color: var(--text-tertiary);
@@ -1578,11 +1578,11 @@ body.dark-mode .color-circle.selected {
 }
 
 .diff-viewer-unified .diff-line-num {
-  width: 70px;
+  width: clamp(28px, 5vw, 70px);
   flex-shrink: 0;
   text-align: right;
-  padding-right: 12px;
-  padding-left: 8px;
+  padding-right: clamp(6px, 1vw, 12px);
+  padding-left: clamp(4px, 0.8vw, 8px);
   color: var(--text-tertiary);
   user-select: none;
   border-right: 1px solid var(--border-subtle);
@@ -1709,7 +1709,7 @@ body.dark-mode .diff-expand-separator {
 }
 
 .diff-line-marker {
-  width: 24px;
+  width: clamp(12px, 2vw, 24px);
   flex-shrink: 0;
   text-align: center;
   color: var(--text-tertiary);
@@ -1719,10 +1719,10 @@ body.dark-mode .diff-expand-separator {
 }
 
 .diff-line-num {
-  width: 50px;
+  width: clamp(20px, 3.5vw, 50px);
   flex-shrink: 0;
   text-align: right;
-  padding-right: 8px;
+  padding-right: clamp(4px, 1vw, 8px);
   color: var(--text-tertiary);
   user-select: none;
   border-right: 1px solid var(--border-subtle);
