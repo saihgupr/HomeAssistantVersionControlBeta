@@ -1,20 +1,14 @@
-# Home Assistant Version Control Beta
+# Home Assistant Version Control
 
 **Automatic backup, history tracking, and instant restore for your Home Assistant configuration.**
 
 Home Assistant Version Control provides complete version history for your setup. It automatically tracks every change to your YAML configuration files using a robust local Git backend. Browse your history, visualize diffs, and restore individual files or your entire configuration to any previous state with a single click.
 
-> [!IMPORTANT]
-> 1. **Existing Git Repos:** If you already have a `.git` folder in your `/config` directory, **back it up first**. The add-on will use your existing repository but may conflict with your workflow through auto-commits and automatic merging of old history. **For best results, delete the existing `.git` folder** and let the add-on create a fresh repository.
-> 2. **Backup Strategy:** While this add-on provides excellent version control, **do not rely on it as your sole backup method**. Always maintain external backups (e.g., Google Drive, Samba) of your Home Assistant instance.
-
----
-
-![Screenshot 1](images/screenshots/1.png)
-![Screenshot 2](images/screenshots/2.png)
-![Screenshot 3](images/screenshots/3.png)
-![Screenshot 4](images/screenshots/4.png)
-![Screenshot 5](images/screenshots/5.png)
+![Screenshot 1](https://raw.githubusercontent.com/saihgupr/HomeAssistantVersionControl/main/images/screenshots/1.png)
+![Screenshot 2](https://raw.githubusercontent.com/saihgupr/HomeAssistantVersionControl/main/images/screenshots/2.1.png)
+![Screenshot 3](https://raw.githubusercontent.com/saihgupr/HomeAssistantVersionControl/main/images/screenshots/3.png)
+![Screenshot 4](https://raw.githubusercontent.com/saihgupr/HomeAssistantVersionControl/main/images/screenshots/4.png)
+![Screenshot 5](https://raw.githubusercontent.com/saihgupr/HomeAssistantVersionControl/main/images/screenshots/5.png)
 
 ##  Key Features
 
@@ -22,7 +16,7 @@ Home Assistant Version Control provides complete version history for your setup.
 * **Zero-Effort Backups:** Every edit is saved automatically.
 * **Smart Debouncing:** Multiple rapid edits are grouped into a single save snapshot (customizable delay).
 * **Comprehensive Tracking:** Monitors `.yaml`, `.yml`, and `lovelace` dashboard files (both UI and YAML mode).
-* **Efficient Storage:** Uses Git deduplication to minimize disk usage—only stores the differences between versions.
+* **Efficient Storage:** Uses Git deduplication to minimize disk usage by storing only the differences between versions.
 
 ### Timeline & History
 * **Chronological Feed:** View changes grouped by "Today," "Yesterday," and "Earlier."
@@ -48,6 +42,10 @@ Home Assistant Version Control provides complete version history for your setup.
 
 ## Installation
 
+> [!IMPORTANT]
+> 1. **Existing Git Repos:** If you already have a `.git` folder in your `/config` directory, **back it up first**. The add-on will use your existing repository but may conflict with your workflow through auto-commits and automatic merging of old history. **For best results, delete the existing `.git` folder** and let the add-on create a fresh repository.
+> 2. **Backup Strategy:** While this add-on provides excellent version control, **do not rely on it as your sole backup method**. Always maintain external backups (e.g., Google Drive, Samba) of your Home Assistant instance.
+
 There are two ways to install Home Assistant Version Control: as a Home Assistant add-on or as a standalone Docker container.
 
 ### 1. Home Assistant Add-on (Recommended for most users)
@@ -64,9 +62,8 @@ There are two ways to install Home Assistant Version Control: as a Home Assistan
       ```
       https://github.com/saihgupr/ha-addons
       ```
-
 2.  **Install the Add-on:**
-    The "Home Assistant Version Control Beta" add-on will now appear in the store. Click on it and then click "Install".
+    The "Home Assistant Version Control" add-on will now appear in the store. Click on it and then click "Install".
 
 3.  **Start:** Start the add-on and click **"Open Web UI"** to access the interface.
 
@@ -80,7 +77,7 @@ For Docker users who aren't using the Home Assistant add-on, you have three depl
 
 1. Download the compose.yaml file:
    ```bash
-   curl -o compose.yaml https://raw.githubusercontent.com/saihgupr/HomeAssistantVersionControlBeta/main/compose.yaml
+   curl -o compose.yaml https://raw.githubusercontent.com/saihgupr/HomeAssistantVersionControl/main/compose.yaml
    ```
 
 2. Edit the file to set your paths and timezone:
@@ -103,11 +100,12 @@ Access the interface at `http://localhost:54001`.
 docker run -d \
   -p 54001:54001 \
   -v /path/to/your/config:/config \
+  -v /path/to/havc-data:/data \
   -e TZ=America/New_York \
   -e SUPERVISOR_TOKEN=your_long_lived_access_token_here \
   -e HA_URL=http://homeassistant.local:8123 \
   --name home-assistant-version-control \
-  ghcr.io/saihgupr/ha-version-control:latest
+  ghcr.io/saihgupr/home-assistant-version-control:latest
 ```
 
 Replace `/path/to/your/config` with the actual path to your Home Assistant configuration directory.
@@ -115,13 +113,14 @@ Replace `/path/to/your/config` with the actual path to your Home Assistant confi
 **Option C: Build locally:**
 
 ```bash
-git clone https://github.com/saihgupr/HomeAssistantVersionControlBeta.git
-cd HomeAssistantVersionControlBeta/homeassistant-version-control
+git clone https://github.com/saihgupr/HomeAssistantVersionControl.git
+cd HomeAssistantVersionControl/homeassistant-version-control
 docker build --build-arg BUILD_FROM=alpine:latest -t home-assistant-version-control .
 
 docker run -d \
   -p 54001:54001 \
   -v /path/to/your/config:/config \
+  -v /path/to/havc-data:/data \
   -e TZ=America/New_York \
   -e SUPERVISOR_TOKEN=your_long_lived_access_token_here \
   -e HA_URL=http://homeassistant.local:8123 \
@@ -130,7 +129,8 @@ docker run -d \
 ```
 
 > [!NOTE]
-> The `SUPERVISOR_TOKEN` and `HA_URL` are optional. You can omit those lines if you don't need Home Assistant restart/reload features.
+> - The `SUPERVISOR_TOKEN` and `HA_URL` are optional. You can omit those lines if you don't need Home Assistant restart/reload features.
+> - The `/data` volume is optional but recommended. It persists your settings (debounce time, retention settings) between container restarts.
 
 Access the interface at `http://localhost:54001`.
 
@@ -161,7 +161,11 @@ The add-on automatically tracks configuration files while ignoring system files.
 | `secrets.yaml` | Python cache (`__pycache__`) |
 | Lovelace dashboards (`.storage/lovelace*`) | Binary files (Images, Videos) |
 | `esphome/*.yaml` | Temporary files |
-| All other `.yaml` and `.yml` files | |
+| All other `.yaml` and `.yml` files | Files in `.gitignore` |
+
+> [!TIP]
+> **Excluding Files (e.g., secrets.yaml):**
+> You can prevent specific files from being tracked by adding them to a `.gitignore` file in your `/config` directory. Just list the filenames (one per line) that you want to hide, and the add-on will automatically exclude them from version control.
 
 ---
 
@@ -245,8 +249,12 @@ curl -X POST http://homeassistant.local:54001/api/retention/cleanup \
 
 ---
 
+## Alternative Options
+
+For a simpler backup approach that stores everything as plain YAML folders, check out [Home Assistant Time Machine](https://github.com/saihgupr/HomeAssistantTimeMachine). It gives you a clean interface to view YAML backups and restore individual items with a click.
+
 ##  Support
 
-Found a bug or have a feature request? Please [submit an issue on GitHub](https://github.com/saihgupr/HomeAssistantVersionControlBeta/issues).
+Found a bug or have a feature request? Please [submit an issue on GitHub](https://github.com/saihgupr/HomeAssistantVersionControl/issues).
 
 **If you find this add-on helpful, please ⭐ star the repository!**

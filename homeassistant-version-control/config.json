@@ -1,9 +1,9 @@
 {
-  "name": "Home Assistant Version Control Beta",
-  "version": "1.0.1",
-  "slug": "home-assistant-version-control-beta",
+  "name": "Home Assistant Version Control",
+  "version": "1.0.0",
+  "slug": "home-assistant-version-control",
   "description": "Git-powered version control and automated backup for your Home Assistant configuration files.",
-  "url": "https://github.com/saihgupr/HomeAssistantVersionControlBeta",
+  "url": "https://github.com/saihgupr/HomeAssistantVersionControl",
   "startup": "application",
   "boot": "auto",
   "arch": [
@@ -45,15 +45,14 @@
     "retries": 3
   },
   "codeowners": [
-    "@yourusername"
+    "@saihgupr"
   ],
   "labels": {
-    "org.opencontainers.image.title": "Home Assistant Version Control Beta",
+    "org.opencontainers.image.title": "Home Assistant Version Control",
     "org.opencontainers.image.description": "Git-powered version control for Home Assistant configuration",
-    "org.opencontainers.image.source": "https://github.com/yourusername/havc-addon",
+    "org.opencontainers.image.source": "https://github.com/saihgupr/HomeAssistantVersionControl",
     "org.opencontainers.image.licenses": "MIT"
   },
-  "stage": "experimental",
   "supported": false,
   "ingress": true,
   "panel_icon": "mdi:auto-fix",

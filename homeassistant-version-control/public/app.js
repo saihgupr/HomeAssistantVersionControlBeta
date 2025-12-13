@@ -217,9 +217,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   const primaryColorInput = document.getElementById('picassoPrimaryColor');
   const secondaryColorInput = document.getElementById('picassoSecondaryColor');
 
-  // Load saved colors or use defaults
-  const savedPrimaryColor = localStorage.getItem('picassoPrimaryColor') || '#c4ba52';
-  const savedSecondaryColor = localStorage.getItem('picassoSecondaryColor') || '#00abab';
+  // Load saved colors or use defaults (Ocean palette - two blues)
+  const savedPrimaryColor = localStorage.getItem('picassoPrimaryColor') || '#2193b0';
+  const savedSecondaryColor = localStorage.getItem('picassoSecondaryColor') || '#6dd5ed';
 
   primaryColorInput.value = savedPrimaryColor;
   secondaryColorInput.value = savedSecondaryColor;
@@ -1160,13 +1160,13 @@ function formatDateDisplay(bucket) {
 function formatDateForLabel(dateString) {
   if (!dateString) return '';
   const date = new Date(dateString);
-  return date.toLocaleString('en-US', {
+  // Use browser default locale and options
+  return date.toLocaleString(undefined, {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
     hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
+    minute: '2-digit'
   });
 }
 
@@ -1676,13 +1676,13 @@ async function displayCommits(commits) {
 
       for (const commit of groups[bucket]) {
         const commitDate = new Date(commit.date);
-        const timeString = commitDate.toLocaleString('en-US', {
+        // Use browser default locale
+        const timeString = commitDate.toLocaleString(undefined, {
           month: 'short',
           day: 'numeric',
           year: 'numeric',
           hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
+          minute: '2-digit'
         });
 
         // Extract just the filename from the commit message
@@ -3392,18 +3392,14 @@ function displayFileHistory(filePath) {
 
 function formatDateForBanner(dateString) {
   const date = new Date(dateString);
-  // Format: Nov 26, 2025 1:00 PM
-  const datePart = date.toLocaleDateString('en-US', {
+  // Use browser default locale
+  return date.toLocaleString(undefined, {
+    year: 'numeric',
     month: 'short',
     day: 'numeric',
-    year: 'numeric'
-  });
-  const timePart = date.toLocaleTimeString('en-US', {
     hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
+    minute: '2-digit'
   });
-  return `${datePart} ${timePart}`;
 }
 
 function trimEmptyLines(lines) {
@@ -3501,8 +3497,8 @@ async function loadFileHistoryDiff(filePath) {
     filePath: filePath
   });
 
-  // Show restore button only if compareToCurrent is ON and there are changes
-  if (compareToCurrent && diffHtml && !isNewlyAdded) {
+  // Show restore button if there are changes (regardless of comparison mode)
+  if (diffHtml && !isNewlyAdded) {
     document.getElementById('rightPanelActions').innerHTML = `<button class="btn restore" onclick="restoreFileVersion('${filePath}')" title="${t('diff.tooltip_overwrite_file')}">${t('timeline.restore_commit')}</button>`;
   } else {
     document.getElementById('rightPanelActions').innerHTML = '';
@@ -5284,7 +5280,7 @@ function blendColors(color1, color2, ratio) {
 let holidayDesign = {
   currentPlaidIndex: parseInt(localStorage.getItem('holidayPlaidIndex')) || 1,
   ribbonWidth: parseInt(localStorage.getItem('holidayRibbonWidth')) || 19,
-  ribbonStyle: parseInt(localStorage.getItem('holidayRibbonStyle')) || 4,
+  ribbonStyle: parseInt(localStorage.getItem('holidayRibbonStyle')) || 1,
   ribbon3D: parseInt(localStorage.getItem('holidayRibbon3D')) || 10,
   ribbonBrightness: localStorage.getItem('holidayRibbonBrightness') !== null ? parseInt(localStorage.getItem('holidayRibbonBrightness')) : -5,
   plaidSize: parseInt(localStorage.getItem('holidayPlaidSize')) || 24,

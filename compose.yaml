@@ -1,8 +1,8 @@
 services:
   ha-version-control:
     # Note: Ensure a Docker image has been published via GitHub Actions first
-    # Or build locally with: docker build -t ghcr.io/saihgupr/ha-version-control:latest ./homeassistant-version-control
-    image: ghcr.io/saihgupr/ha-version-control:latest
+    # Or build locally with: docker build -t ghcr.io/saihgupr/home-assistant-version-control:latest ./homeassistant-version-control
+    image: ghcr.io/saihgupr/home-assistant-version-control:latest
     container_name: ha-version-control
     ports:
       - "54001:54001"
@@ -21,5 +21,9 @@ services:
       # Mount your Home Assistant config directory
       # This directory will be tracked for changes
       - /path/to/your/ha/config:/config
+      
+      # Optional: Persist settings between container restarts
+      # Create this directory or use any path you prefer
+      - /path/to/havc-data:/data
     restart: unless-stopped
 

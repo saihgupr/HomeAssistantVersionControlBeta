@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: saihgupr/ha-version-control
+  IMAGE_NAME: saihgupr/home-assistant-version-control
 
 jobs:
   build:
